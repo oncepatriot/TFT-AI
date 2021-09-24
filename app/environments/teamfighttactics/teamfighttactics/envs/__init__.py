@@ -1,0 +1,1 @@
+from teamfighttactics.envs.teamfighttactics import TeamfightTacticsEnv
