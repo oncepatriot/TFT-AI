@@ -38,36 +38,6 @@ ACTIONS_MAP = {
     "READY_NEXT_STAGE": 25,
 }
 
-ACTIONS_MAP_2 = {
-    1: "BUY_SHOP_POS_1",
-    2: "BUY_SHOP_POS_2",
-    3: "BUY_SHOP_POS_3",
-    4: "BUY_SHOP_POS_4",
-    5: "BUY_SHOP_POS_5",
-    6: "SELL_BENCH_POS_1",
-    7: "SELL_BENCH_POS_2",
-    8: "SELL_BENCH_POS_3",
-    9: "SELL_BENCH_POS_4",
-    10: "SELL_BENCH_POS_5",
-    11: "SELL_BENCH_POS_6",
-    12: "SELL_BENCH_POS_7",
-    13: "SELL_BENCH_POS_8",
-    14: "SELL_BENCH_POS_9",
-    15: "SELL_CHAMPION_POS_1",
-    16: "SELL_CHAMPION_POS_2",
-    17: "SELL_CHAMPION_POS_3",
-    18: "SELL_CHAMPION_POS_4",
-    19: "SELL_CHAMPION_POS_5",
-    20: "SELL_CHAMPION_POS_6",
-    21: "SELL_CHAMPION_POS_7",
-    22: "SELL_CHAMPION_POS_8",
-    23: "SELL_CHAMPION_POS_9",
-    24: "REROLL",
-    25: "BUY_EXP",
-    26: "FINISHED_WITH_ACTIONS_AND_READY_FOR_NEXT_STAGE",
-}
-
-
 
 class TeamfightTacticsEnv(gym.Env):
     metadata = {'render.modes': ['human']}
@@ -78,8 +48,43 @@ class TeamfightTacticsEnv(gym.Env):
         self.manual = manual
 
         self.n_players = 8
+
+        # Vector of all actions available to an agent
         self.action_space = gym.spaces.Discrete(len(ACTIONS_MAP.keys()))
-        self.observation_space = gym.spaces.Box([])
+
+        # For now, agent only sees all of their tft "board" state such as
+        # gold, champion bench, shop, champions. More advanced implementation
+        # would allow each agent to see all player's board states.
+        self.observation_space = gym.spaces.Dict({
+            'gold': gym.spaces.Discrete(200),
+
+            # 9 bench slots that can be occupied by [champion_ids, champion_level]
+            'bench': gym.spaces.Tuple(
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+            ),
+            # 9 units actively placed on board can be occupied by [champion_id, champion_level]
+            'board': gym.spaces.Tuple(
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+                gym.spaces.Box([0, 1], [42, 3]),
+            ),
+            # Each shop space can be occupied by a champion_id or empty
+            'shop': gym.spaces.Box([0]*5, [42]*9)
+        })
 
         # self.players is defined in base class
         # self.current_player_num is defined in base class
@@ -143,17 +148,18 @@ class TeamfightTacticsEnv(gym.Env):
         """The `reset` method is called to reset the game to the starting state, 
         ready to accept the first action.
         """
+        print("CALLED RESET")
         self.current_player_num = 0
 
         self.players = [
+            Player('0'),
             Player('1'),
             Player('2'),
             Player('3'),
             Player('4'),
             Player('5'),
             Player('6'),
-            Player('7'),
-            Player('8')
+            Player('7')
         ]
 
         self.hero_pool = []
