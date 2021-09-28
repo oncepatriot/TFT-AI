@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='teamfighttactics',
     version='0.1.0',
-    description='Teamfight Tactis Gym Environment',
+    description='Teamfight Tactics Gym Environment',
     packages=find_packages(),
     install_requires=[
         'gym>=0.9.4',

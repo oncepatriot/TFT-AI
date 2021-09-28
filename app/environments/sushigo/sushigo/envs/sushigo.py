@@ -43,6 +43,8 @@ class SushiGoEnv(gym.Env):
         self.total_cards = sum([x['count'] for x in self.contents])
 
         self.action_space = gym.spaces.Discrete(self.card_types + self.card_types * self.card_types)
+        print(0, 1, (self.total_cards * self.total_positions + self.n_players + self.action_space.n ,))
+        print(0, 1, (self.total_cards * self.total_positions + self.n_players + self.action_space.n ,))
         self.observation_space = gym.spaces.Box(0, 1, (self.total_cards * self.total_positions + self.n_players + self.action_space.n ,))
         self.verbose = verbose
 

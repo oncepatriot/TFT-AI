@@ -1,42 +1,9 @@
-
 import gym
 import numpy as np
-
 import config
-
 from stable_baselines import logger
-
 from .classes import *
 
-
-ACTIONS_MAP = {
-    "BUY_SHOP_POS_1": 0,
-    "BUY_SHOP_POS_2": 1,
-    "BUY_SHOP_POS_3": 2,
-    "BUY_SHOP_POS_4": 3,
-    "BUY_SHOP_POS_5": 4,
-    "SELL_BENCH_POS_1": 5,
-    "SELL_BENCH_POS_2": 6,
-    "SELL_BENCH_POS_3": 7,
-    "SELL_BENCH_POS_4": 8,
-    "SELL_BENCH_POS_5": 9,
-    "SELL_BENCH_POS_6": 10,
-    "SELL_BENCH_POS_7": 11,
-    "SELL_BENCH_POS_8": 12,
-    "SELL_BENCH_POS_9": 13,
-    "SELL_CHAMPION_POS_1": 14,
-    "SELL_CHAMPION_POS_2": 15,
-    "SELL_CHAMPION_POS_3": 16,
-    "SELL_CHAMPION_POS_4": 17,
-    "SELL_CHAMPION_POS_5": 18,
-    "SELL_CHAMPION_POS_6": 19,
-    "SELL_CHAMPION_POS_7": 20,
-    "SELL_CHAMPION_POS_8": 21,
-    "SELL_CHAMPION_POS_9": 22,
-    "REROLL": 23,
-    "BUY_EXP": 24,
-    "READY_NEXT_STAGE": 25,
-}
 
 
 class TeamfightTacticsEnv(gym.Env):
@@ -44,9 +11,8 @@ class TeamfightTacticsEnv(gym.Env):
 
     def __init__(self, verbose = False, manual = False):
         super(TeamfightTacticsEnv, self).__init__()
-        self.name = 'sushigo'
-        self.manual = manual
-
+        self.name = 'teamfighttactics'
+        self.manual = manual        
         self.n_players = 8
 
         # Vector of all actions available to an agent
@@ -55,41 +21,15 @@ class TeamfightTacticsEnv(gym.Env):
         # For now, agent only sees all of their tft "board" state such as
         # gold, champion bench, shop, champions. More advanced implementation
         # would allow each agent to see all player's board states.
-        self.observation_space = gym.spaces.Dict({
-            'gold': gym.spaces.Discrete(200),
-
-            # 9 bench slots that can be occupied by [champion_ids, champion_level]
-            'bench': gym.spaces.Tuple(
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-            ),
-            # 9 units actively placed on board can be occupied by [champion_id, champion_level]
-            'board': gym.spaces.Tuple(
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-                gym.spaces.Box([0, 1], [42, 3]),
-            ),
-            # Each shop space can be occupied by a champion_id or empty
-            'shop': gym.spaces.Box([0]*5, [42]*9)
-        })
+        self.observation_space = gym.spaces.Box(0, 1, (44,))
 
         # self.players is defined in base class
-        # self.current_player_num is defined in base class
-
+        self.current_player_num = 0
         self.verbose = verbose
+
+        # Game state initialized on reset()
+        self.game_manager = None
+        self.champion_pool = []
 
     @property
     def observation(self):
@@ -97,11 +37,18 @@ class TeamfightTacticsEnv(gym.Env):
         that can be fed as input to the PPO policy network. It should 
         return a numeric representation of the current game state, 
         from the perspective of the current player, where each element
-         of the array is in the range `[-1,1]`.
+        of the array is in the range `[-1,1]`.
         """
-        
-        return "TODO"
+        health = self.current_player.health
+        gold = self.current_player.gold
+        level = self.current_player.level
+        experience = self.current_player.experience
 
+        shop_list = self.current_player.shop
+        bench = self.current_player.bench
+        board = self.current_player.board
+
+        return np.zeros(44)
 
     def step(self, action):
         """The `step` method accepts an `action` from the current active player and performs the
@@ -112,8 +59,10 @@ class TeamfightTacticsEnv(gym.Env):
         Arguments:
             action - int - Action integer that maps to an action in the action space
         """
-
         done = False
+
+        reward = [0.0] * self.n_players
+
 
         # VALIDATE ACTIONS... Money to buy, If ready cant perform any actions.
         # punish taking actions that are invalid
@@ -121,15 +70,9 @@ class TeamfightTacticsEnv(gym.Env):
         if self.legal_actions[action] == 0:
             reward = [1.0/(self.n_players-1)] * self.n_players
             reward[self.current_player_num] = -1
-
-        if action == ACTION_MAPS['READY_NEXT_STAGE']:
-            self.current_player.ready = True
         else:
-            # PERFORM ACTIONS
-            if action in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]:
-                print('performing', action)
-                print('todo: implement the action...')
-
+            self.game_manager.execute_agent_action(self.current_player, action)
+     
         # Update current player to the next player
         self.current_player_num = (self.current_player_num + 1) % self.n_players
 
@@ -139,8 +82,14 @@ class TeamfightTacticsEnv(gym.Env):
         # Eliminate dead players
         # End game if last player standing
         if all([True if player.ready else False for player in self.players]):
-            print('all players are set to ready... TODO: do something.')
+            self.game_manager.stage += 1
+            self.game_manager.simulate_combat_step()
+            self.game_manager.distribute_stage_income()
+            self.game_manager.roll_all_players_shops()
 
+            if self.game_manager.check_game_over():
+                print("GAME OVER")
+                done = True
 
         return self.observation, reward, done, {}
 
@@ -150,7 +99,6 @@ class TeamfightTacticsEnv(gym.Env):
         """
         print("CALLED RESET")
         self.current_player_num = 0
-
         self.players = [
             Player('0'),
             Player('1'),
@@ -161,9 +109,8 @@ class TeamfightTacticsEnv(gym.Env):
             Player('6'),
             Player('7')
         ]
-
-        self.hero_pool = []
-
+        self.game_manager = GameManager(self.players)
+        self.game_manager.create_champion_pool()
 
         self.done = False
 
@@ -174,10 +121,6 @@ class TeamfightTacticsEnv(gym.Env):
         """The `render` function is called to output a visual or human readable
          summary of the current game state to the log file.
         """
-        print("RENDER called")
-        print("current player:" , self.current_player)
-
-    def calculate_combat_step_and_update_player_health():
         return
 
     @property
@@ -188,10 +131,78 @@ class TeamfightTacticsEnv(gym.Env):
         """
         legal_actions = np.zeros(self.action_space.n)
 
-        legal_actions = np.ones(self.action_space.n)
+        current_player = self.current_player
+        gold = current_player.gold
+        shop = current_player.shop
+        bench = current_player.bench
+        board = current_player.bench
+        level = current_player.level
+
+        # Buy shop slot is legal if affordable
+        legal_actions[0] = 1 if shop[0] and shop[0].cost <= gold else 0
+        legal_actions[1] = 1 if shop[1] and shop[1].cost <= gold else 0
+        legal_actions[2] = 1 if shop[2] and shop[2].cost <= gold else 0
+        legal_actions[3] = 1 if shop[3] and shop[3].cost <= gold else 0
+        legal_actions[4] = 1 if shop[4] and shop[4].cost <= gold else 0
+
+        # Sell Bench legal if bench slot is occupied
+        num_bench_units = len(bench)
+        legal_actions[5] = 1 if bench[0] else 0
+        legal_actions[6] = 1 if bench[1] else 0
+        legal_actions[7] = 1 if bench[2] else 0
+        legal_actions[8] = 1 if bench[3] else 0
+        legal_actions[9] = 1 if bench[4] else 0
+        legal_actions[10] = 1 if bench[5] else 0
+        legal_actions[11] = 1 if bench[6] else 0
+        legal_actions[12] = 1 if bench[7] else 0
+        legal_actions[13] = 1 if bench[8] else 0
+
+        # Sell Champion on board legal if board spot is occupied
+        legal_actions[14] = 1 if board[0] else 0
+        legal_actions[15] = 1 if board[1] else 0
+        legal_actions[16] = 1 if board[2] else 0
+        legal_actions[17] = 1 if board[3] else 0
+        legal_actions[18] = 1 if board[4] else 0
+        legal_actions[19] = 1 if board[5] else 0
+        legal_actions[20] = 1 if board[6] else 0
+        legal_actions[21] = 1 if board[7] else 0
+        legal_actions[22] = 1 if board[8] else 0
+
+        # TODO: Move champ from bench to board is legal if board
+        # has an unoccupied space and bench spot is occupied
+        legal_actions[23] = 0
+        legal_actions[24] = 0
+        legal_actions[25] = 0
+        legal_actions[26] = 0
+        legal_actions[27] = 0
+        legal_actions[28] = 0
+        legal_actions[29] = 0
+        legal_actions[30] = 0
+        legal_actions[31] = 0
+
+        # TODO: Move champ from board to bench is legal if 
+        # has unoccupied space on bench
+        legal_actions[32] = 0
+        legal_actions[33] = 0
+        legal_actions[34] = 0
+        legal_actions[35] = 0
+        legal_actions[36] = 0
+        legal_actions[37] = 0
+        legal_actions[38] = 0
+        legal_actions[39] = 0
+        legal_actions[40] = 0
+
+        # Reroll is legal if can afford
+        legal_actions[41] = 1 if gold >= 2 else 0
+
+        # Buy exp is legal if can afford
+        legal_actions[42] = 1 if gold >= 4 else 0
+
+        # Ready for next stage legal:
+        legal_actions[43] = 1
 
         return legal_actions
 
-
-
-
+    @property
+    def current_player(self):
+        return self.players[self.current_player_num]
