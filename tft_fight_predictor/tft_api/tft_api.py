@@ -16,5 +16,4 @@ def get_match_by_match_id(match_id):
     r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/{match_id}?api_key={API_KEY}")
     return r.json()
 
-
-# get_match_by_match_id(TEST_MATCH_ID)
+get_match_by_match_id(TEST_MATCH_ID)
