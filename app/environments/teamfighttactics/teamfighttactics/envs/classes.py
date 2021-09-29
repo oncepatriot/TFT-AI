@@ -130,7 +130,7 @@ class GameManager():
         # First roll rarity, then roll a champion in that rarity
         for i in range(5):
            champ_level = random.choices([1, 2, 3, 4, 5], players_odds)
-           champ = random.choice(self.champion_pool[champ_level])
+           champ = random.choice(self.champion_pool[champ_level[0]])
            shop.append(champ)
 
         player.shop = shop

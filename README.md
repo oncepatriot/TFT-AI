@@ -288,3 +288,10 @@ There are many repositories and blogs that have helped me to put together this r
 [license-url]: https://github.com/davidADSP/SIMPLE/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/davidtfoster
+
+
+SSH into container
+
+docker exec -it selfplay bash
+docker-compose exec app python3 train.py -r -e teamfighttactics
+docker-compose exec app python3 tft_ml.py

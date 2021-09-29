@@ -1,4 +1,4 @@
-{
+sample_match_data = {
     "metadata": {
         "data_version": "5",
         "match_id": "NA1_4055327358",
