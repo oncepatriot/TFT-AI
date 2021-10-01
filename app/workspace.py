@@ -1,6 +1,20 @@
 import environments.teamfighttactics.teamfighttactics.envs.game_utils as game_utils
 import environments.teamfighttactics.teamfighttactics.envs.game_engine as game_engine
 
-gm = game_engine.GameManager([1,2,3,4,5,6,7,8])
-gm.create_champion_pool()
-print(gm.champion_pool[1][0])
+players = []
+for i in range(8):
+	players.append(game_engine.Player(i))
+
+gm = game_engine.GameManager(players)
+
+for i in range(5):
+	gm.print_board_state()
+	gm.increment_stage_round()
+	gm.simulate_combat_step()
+	gm.distribute_income()
+	gm.roll_all_players_shops()
+
+print("\n\n\n\n\n")
+gm.purchase_hero_at_shop_index(gm.players[3],0)
+gm.print_board_state()
+  

@@ -81,9 +81,10 @@ class TeamfightTacticsEnv(gym.Env):
         # Eliminate dead players
         # End game if last player standing
         if all([True if player.ready else False for player in self.players]):
-            self.game_manager.stage += 1
+            
             self.game_manager.simulate_combat_step()
-            self.game_manager.distribute_stage_income()
+            self.game_manager.distribute_income()
+            self.game_manager.increment_stage()
             self.game_manager.roll_all_players_shops()
 
             if self.game_manager.check_game_over():
