@@ -2,8 +2,7 @@ import gym
 import numpy as np
 import config
 from stable_baselines import logger
-from .classes import *
-
+from .game_engine import *
 
 
 class TeamfightTacticsEnv(gym.Env):

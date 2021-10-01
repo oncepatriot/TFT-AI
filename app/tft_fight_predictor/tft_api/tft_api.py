@@ -25,8 +25,8 @@ def get_match_by_match_id(match_id):
 def run_match_data_scraper():
     player_puuids = [TEST_PUUID]
     match_ids_processed = {}
-    while True:
-    	time.sleep(15)
+    while True:   
+        time.sleep(15)
         print("Getting match ids by puuid:")
         puuid = player_puuids.pop(0)
 
@@ -34,21 +34,27 @@ def run_match_data_scraper():
         match_ids = random.sample(match_ids, 10)
 
         for match_id in match_ids:
-        	if not match_ids_processed.get(match_id):
-	            match_data = get_match_by_match_id(match_id)
-	            match_puuids = match_data['metadata']['participants']
-	            match_puuids.remove(puuid)
-	            player_puuids.append(match_puuids)
+            if not match_ids_processed.get(match_id):
+                match_data = get_match_by_match_id(match_id)
+                match_puuids = match_data['metadata']['participants']
+                match_puuids.remove(puuid)
+                player_puuids.append(match_puuids)
 
-	            print("Processing Match Data: ", match_id)
-	            process_match_data_and_add_to_training_data_set(match_data)
-	            match_ids_processed[match_id] = True
-	            time.sleep(15)
-	        else:
-	        	continue
+                print("Processing Match Data: ", match_id)
+                process_match_data_and_add_to_training_data_set(match_data)
+                match_ids_processed[match_id] = True
+                time.sleep(15)
+            else:
+                continue
 
 def process_match_data_and_add_to_training_data_set(match_data):
-	# TODO: DOES NOT HANDLE 10/11/12 UNITS FROM FONS
+	"""
+	Periodically query Riot TFT API for match data to process and
+	add to training data. TODO: Separate the processing into smaller functions
+	
+	"""
+
+    # TODO: DOES NOT HANDLE 10/11/12 UNITS FROM FONS?
     players = match_data["info"]["participants"]
     players = sorted(players, key=lambda i: i['placement'])
     players = [{
@@ -67,8 +73,6 @@ def process_match_data_and_add_to_training_data_set(match_data):
             else:
                 match_pairs.append([1, j, i])
 
-
-
     # Generate more match pair data by pairing players against
     # strictly worse versions of themselves. (one less unit)
     for player in players:
@@ -78,10 +82,13 @@ def process_match_data_and_add_to_training_data_set(match_data):
             player_copy['units'].pop()
             weaker = copy.deepcopy(player_copy)
             
-            if random.randint(0, 1) == 1:
-                match_pairs.append([0, stronger, weaker])
-            else:
-                match_pairs.append([1, weaker, stronger])
+            # Randomize whether to add to data set to not influence
+            # model too much that more unit = win
+            if random.randint(0,100) < 15:
+	            if random.randint(0, 1) == 1:
+	                match_pairs.append([0, stronger, weaker])
+	            else:
+	                match_pairs.append([1, weaker, stronger])
 
     rows = []
     for match_pair in match_pairs:

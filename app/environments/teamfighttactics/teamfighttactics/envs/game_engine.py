@@ -1,4 +1,6 @@
 import random
+from . import game_utils
+
 
 SET_DATA = {
     "ROLL_ODDS": {
@@ -13,7 +15,6 @@ SET_DATA = {
         9: [10, 15, 30, 30, 15]
     }
 }
-
 ACTIONS_MAP = {
     "BUY_SHOP_POS_1": 0,
     "BUY_SHOP_POS_2": 1,
@@ -62,28 +63,6 @@ ACTIONS_MAP = {
     "READY_NEXT_STAGE": 43,
 }
 
-class Traits():
-    DAWNBRINGER = "DAWNBRINGER"
-    ASSASSIN = "ASSASSIN"
-    KNIGHT = "KNIGHT"
-    HELLION = "HELLION"
-    CAVALIER = "CAVALIER"
-    SPELLWEAVER = "SPELLWEAVER"
-    DRACONIC = "DRACONIC"
-    SKIRMISHER = "SKIRMISHER"
-    RENEWER = "RENEWER"
-    LEGIONNAIRE = "LEGIONNAIRE"
-    NIGHBRINGER = "NIGHBRINGER"
-    BRAWLER = "BRAWLER"
-    REVENANT = "REVENANT"
-    ABOMINATION = "ABOMINATION"
-    SENTINEL = "SENTINEL"
-    NIGHTBRINGER = "NIGHTBRINGER"
-    CANNONEER = "CANNONEER"
-    REDEEMED = "REDEEMED"
-
-
-
 class GameManager():
     def __init__(self, players):
         self.players = players
@@ -100,16 +79,31 @@ class GameManager():
         }
 
         # TIER 1: 29 of each champ
-        for c in [GRAGAS, KHAZIX, KLED, ZIGGS, POPPY, UDYR, OLAF, SENNA, LEONA, VLADIMIR, AATROX, KALISTA]:
+        for champ in game_utils.get_cost_x_champions(1):
             for i in range(29):
-                champion_pool[1].append(Champion(c['id'], c['name'], 1, c['cost'], c['traits']))
+                champion_pool[1].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
+
+        for champ in game_utils.get_cost_x_champions(2):
+            for i in range(22):
+                champion_pool[2].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
+        
+        for champ in game_utils.get_cost_x_champions(3):
+            for i in range(18):
+                champion_pool[2].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
+        
+        for champ in game_utils.get_cost_x_champions(4):
+            for i in range(12):
+                champion_pool[2].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
+        
+        for champ in game_utils.get_cost_x_champions(5):
+            for i in range(1-):
+                champion_pool[2].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
 
         return champion_pool
 
     def distribute_stage_income(self):
         for player in self.players:
-            # TODO: income calculations
-            player.gold += 10
+            player.gold += player.income
 
     def check_game_over(self):
         alive_players = 0
@@ -124,7 +118,6 @@ class GameManager():
 
     def roll_players_shop(self, player):
         shop = []
-
         players_odds = SET_DATA["ROLL_ODDS"][player.level]
 
         # First roll rarity, then roll a champion in that rarity
@@ -143,14 +136,39 @@ class GameManager():
         # TODO: actual matchmaking and detect winners
         for player in self.players:
             win = random.randint(0,1) == 1
-            if not win:
-                player.health -= 10
-                
+            if win:
+                player.gold += 1
+            else:
+                player.health = player.health - 20
+        
             player.ready = False
 
-    def purchase_hero_at_shop_index(self, player, index):
-        # TODO
+    def purchase_hero_at_shop_index(self, player, shop_index):
+        players_shop = player.shop
+        champion = players_shop[shop_index]
+
+        if player.gold >= champion.cost:
+            # Puchase the hero: 
+            # deduct gold, add to players bench, and remove from champion pool
+            player.gold = player.gold - champion.cost
+            player.add_to_bench(champion)
+            self.champion_pool[champion.cost].remove(champion)
+        else:
+            raise Exception("tried to buy champ couldnt afford")
+
         return
+
+    def sell_hero_at_bench_index(self, player, bench_index):
+        print("TODO sell hero on bench")
+
+    def sell_hero_at_board_index(self, player, board_index):
+        print("TODO sell hero on bench")
+
+    def place_champion_from_bench_to_board(self, player, bench_index):
+        print("TODO bench to board")
+
+    def place_champion_from_board_to_bench(self, player, board_index):
+         print("TODO Board to bench")
 
     # action - int - action integer
     def execute_agent_action(self, player, action):
@@ -201,6 +219,24 @@ class GameManager():
             print("need to implement", action)
         elif action == ACTIONS_MAP["SELL_CHAMPION_POS_9"]:
             print("need to implement", action)
+        elif action == ACTIONS_MAP["BENCH_1_TO_BOARD"]:
+            print("need to implement", action)
+        elif action == ACTIONS_MAP["BENCH_2_TO_BOARD"]:
+            print("need to implement", action)
+        elif action == ACTIONS_MAP["BENCH_3_TO_BOARD"]:
+            print("need to implement", action)
+        elif action == ACTIONS_MAP["BENCH_4_TO_BOARD"]:
+            print("need to implement", action)
+        elif action == ACTIONS_MAP["BENCH_5_TO_BOARD"]:
+            print("need to implement", action)
+        elif action == ACTIONS_MAP["BENCH_6_TO_BOARD"]:
+            print("need to implement", action)
+        elif action == ACTIONS_MAP["BENCH_7_TO_BOARD"]:
+            print("need to implement", action)
+        elif action == ACTIONS_MAP["BENCH_8_TO_BOARD"]:
+            print("need to implement", action)
+        elif action == ACTIONS_MAP["BENCH_9_TO_BOARD"]:
+            print("need to implement", action)
         elif action == ACTIONS_MAP["BOARD_1_TO_BENCH"]:
             print("need to implement", action)
         elif action == ACTIONS_MAP["BOARD_2_TO_BENCH"]:
@@ -242,7 +278,27 @@ class Player():
         self.bench = [None]*9
         self.health = 100
         self.ready = False
+        self.items = []
 
+        self.streak = 0 # negative is lose streak, positive is win streak
+
+    def add_champion_to_bench(self, champion):
+        print("TODO: ADD CHAMP TO BENCH, maybe level up")
+
+    @property
+    def income(self):
+        income = 5
+
+        if abs(self.streak) == 5:
+            income += 3
+        elif abs(self.streak) == 4:
+            income += 2
+        elif abs(self.streak) > 1:
+            income += 1
+
+        return self.gold
+    
+    
     @property
     def is_eliminated(self):
         return self.health <= 0
@@ -255,87 +311,7 @@ class Champion():
         self.name = name
         self.cost = cost
         self.traits = traits
+        self.items = []
 
-GRAGAS = {
-    "id": 1,
-    "name": "Gragas",
-    "traits": [Traits.DAWNBRINGER, Traits.BRAWLER],
-    "cost": 1
-}
-
-KHAZIX = {
-    "id": 2,
-    "name": "Khazix",
-    "traits": [Traits.DAWNBRINGER, Traits.ASSASSIN],
-    "cost": 1
-}
-
-KLED = {
-    "id": 3,
-    "name": "Kled",
-    "traits": [Traits.HELLION, Traits.CAVALIER],
-    "cost": 1
-}
-
-ZIGGS = {
-    "id": 4,
-    "name": "Ziggs",
-    "traits": [Traits.HELLION, Traits.SPELLWEAVER],
-    "cost": 1
-}
-
-POPPY = {
-    "id": 5,
-    "name": "Poppy",
-    "traits": [Traits.HELLION, Traits.KNIGHT],
-    "cost": 1
-}
-
-UDYR = {
-    "id": 6,
-    "name": "Udyr",
-    "traits": [Traits.DRACONIC, Traits.SKIRMISHER],
-    "cost": 1
-}
-
-OLAF = {
-    "id": 7,
-    "name": "Olaf",
-    "traits": [Traits.SENTINEL, Traits.SKIRMISHER],
-    "cost": 1
-}
-
-SENNA = {
-    "id": 8,
-    "name": "Senna",
-    "traits": [Traits.SENTINEL, Traits.CANNONEER],
-    "cost": 1
-}
-
-LEONA = {
-    "id": 9,
-    "name": "Leona",
-    "traits": [Traits.KNIGHT, Traits.REDEEMED],
-    "cost": 1
-}
-
-VLADIMIR = {
-    "id": 10,
-    "name": "Vladimir",
-    "traits": [Traits.NIGHTBRINGER, Traits.RENEWER],
-    "cost": 1
-}
-
-AATROX = {
-    "id": 11,
-    "name": "Aatrox",
-    "traits": [Traits.LEGIONNAIRE, Traits.REDEEMED],
-    "cost": 1
-}
-
-KALISTA = {
-    "id": 12,
-    "name": "Kalista",
-    "traits": [Traits.LEGIONNAIRE, Traits.ABOMINATION],
-    "cost": 1
-}
+    def __str__(self):
+        return f"Level {self.level} {self.id} with {" ".join(items)}"

@@ -293,5 +293,7 @@ There are many repositories and blogs that have helped me to put together this r
 SSH into container
 
 docker exec -it selfplay bash
+docker-compose exec app python3 run_data_scraper.py
+docker-compose exec app python3 run_model_trainer.py
+docker-compose exec app python3 test.py -r -e teamfighttactics
 docker-compose exec app python3 train.py -r -e teamfighttactics
-docker-compose exec app python3 tft_ml.py
