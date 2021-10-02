@@ -15,6 +15,14 @@ for i in range(5):
 	gm.roll_all_players_shops()
 
 print("\n\n\n\n\n")
-gm.purchase_hero_at_shop_index(gm.players[3],0)
-gm.print_board_state()
-  
+for i in range(40):
+	gm.players[3].gold = 99
+	if gm.players[3].bench_is_full:
+		gm.sell_champion_at_bench_index(gm.players[3], 4)
+		gm.players[3].print_player()
+
+	gm.purchase_champion_at_shop_index(gm.players[3],0)
+
+	gm.roll_all_players_shops()
+
+	gm.players[3].print_player()

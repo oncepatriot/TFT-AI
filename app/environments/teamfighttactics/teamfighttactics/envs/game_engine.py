@@ -1,5 +1,6 @@
 import random
 from . import game_utils
+import numpy as np
 
 
 SET_DATA = {
@@ -171,7 +172,12 @@ class GameManager():
         
             player.ready = False
 
-    def purchase_hero_at_shop_index(self, player, shop_index):
+    def purchase_champion_at_shop_index(self, player, shop_index):
+        # TODO: Player can buy champ if bench is full but buying will
+        # upgrade the champion
+        if player.bench_is_full:
+            raise Exception("Tried to buy champ with full bench")
+
         players_shop = player.shop
         champion = players_shop[shop_index]
 
@@ -196,25 +202,33 @@ class GameManager():
         bench_locations = []
         board_locations = []
         for index, c in enumerate(bench):
-            if c.id == champion.id:
+            if c and champion.is_same_level_and_champ(c):
                 num_champs += 1
                 bench_locations.append(index)
 
         for index, c in enumerate(board):
-            if c.id == champion.id
+            if c and champion.is_same_level_and_champ(c):
                 num_champs += 1
                 board_locations.append(index)
 
         if num_champs == 3:
+            print("Upgrading champion for player:", player, champion.id)
+            for b in bench_locations:
+                player.bench[b] = None
+            for b in board_locations:
+                player.board[b] = None
 
-        # Check if player has 3 of a kind on board and bench
+            upgraded_champ = Champion(champion.id, champion.name, champion.level + 1, champion.cost, champion.traits)
+            player.add_champion_to_bench(upgraded_champ)
+            self.maybe_upgrade_champions_for_player(player, champion) # Check again for double upgrade
 
-
+        else:
+            return
 
     def sell_champion_at_bench_index(self, player, bench_index):
         champion = player.bench[bench_index]
         if champion:
-            player.bench[bench_index] == None
+            player.bench[bench_index] = None
             player.gold += champion.sell_value
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
         else:
@@ -243,19 +257,19 @@ class GameManager():
     def execute_agent_action(self, player, action):
         print("EXECUTING AGENT ACTION", player.id, action)
         if action == ACTIONS_MAP["BUY_SHOP_POS_1"]:
-            self.purchase_hero_at_shop_index(player,0)
+            self.purchase_champion_at_shop_index(player,0)
 
         elif action == ACTIONS_MAP["BUY_SHOP_POS_2"]:
-            self.purchase_hero_at_shop_index(player,1)
+            self.purchase_champion_at_shop_index(player,1)
 
         elif action == ACTIONS_MAP["BUY_SHOP_POS_3"]:
-            self.purchase_hero_at_shop_index(player,2)
+            self.purchase_champion_at_shop_index(player,2)
 
         elif action == ACTIONS_MAP["BUY_SHOP_POS_4"]:
-            self.purchase_hero_at_shop_index(player,3)
+            self.purchase_champion_at_shop_index(player,3)
 
         elif action == ACTIONS_MAP["BUY_SHOP_POS_5"]:
-            self.purchase_hero_at_shop_index(player,4)        
+            self.purchase_champion_at_shop_index(player,4)        
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_1"]:
             self.sell_champion_at_board_index(player, 0)
@@ -479,6 +493,20 @@ class Player():
                 return
 
     @property
+    def bench_is_full(self):
+        return (None not in self.bench)
+    
+    @property
+    def board_is_full(self):
+        champions_on_board = 0
+        for c in self.board:
+            if c == None:
+                champions_on_board += 1
+
+        if champions_on_board == self.level:
+            return True
+    
+    @property
     def income(self):
         income = 5
         if abs(self.streak) == 5:
@@ -514,6 +542,9 @@ class Champion():
     def __str__(self):
         return f"Level {self.level} {self.id}"
 
+    def is_same_level_and_champ(self, champ):
+        return self.level == champ.level and self.id == champ.id
+
     @property
     def sell_value(self):
         if self.level > 1:
@@ -534,3 +565,58 @@ class Champion():
                 champions.append(Champion(self.id, self.name, 1, self.cost, self.traits))
 
         return champions
+
+
+def is_action_legal(board, player, action):
+    # Player puchasing champ must have a bench slot and enough gold. TODO:
+    # technically they can buy if bench is full and buying champ levels champ up
+    if action == ACTIONS_MAP["BUY_SHOP_POS_1"]:
+        return (not player.bench_is_full and player.shop[0].cost <= player.gold)
+    elif action == ACTIONS_MAP["BUY_SHOP_POS_2"]:
+        return (not player.bench_is_full and player.shop[1].cost <= player.gold)
+    elif action == ACTIONS_MAP["BUY_SHOP_POS_3"]:
+        return (not player.bench_is_full and player.shop[2].cost <= player.gold)
+    elif action == ACTIONS_MAP["BUY_SHOP_POS_4"]:
+        return (not player.bench_is_full and player.shop[3].cost <= player.gold)
+    elif action == ACTIONS_MAP["BUY_SHOP_POS_5"]:
+        return (not player.bench_is_full and player.shop[4].cost <= player.gold)
+
+    # Player can sell bench at position if it is not empty
+    elif action == ACTIONS_MAP["SELL_BENCH_POS_1"]:
+        return (player.bench[0] != None)
+    elif action == ACTIONS_MAP["SELL_BENCH_POS_2"]:
+        return (player.bench[1] != None)
+    elif action == ACTIONS_MAP["SELL_BENCH_POS_3"]:
+        return (player.bench[2] != None)
+    elif action == ACTIONS_MAP["SELL_BENCH_POS_4"]:
+        return (player.bench[3] != None)
+    elif action == ACTIONS_MAP["SELL_BENCH_POS_5"]:
+        return (player.bench[4] != None)
+    elif action == ACTIONS_MAP["SELL_BENCH_POS_6"]:
+        return (player.bench[5] != None)
+    elif action == ACTIONS_MAP["SELL_BENCH_POS_7"]:
+        return (player.bench[6] != None)
+    elif action == ACTIONS_MAP["SELL_BENCH_POS_8"]:
+        return (player.bench[7] != None)
+    elif action == ACTIONS_MAP["SELL_BENCH_POS_9"]:
+        return (player.bench[8] != None)
+
+    # Player can sell champion at board position x if not empty
+    elif action == ACTIONS_MAP["SELL_CHAMPION_POS_1"]:
+        self.sell_champion_at_board_index(player, 0)
+    elif action == ACTIONS_MAP["SELL_CHAMPION_POS_2"]:
+        self.sell_champion_at_board_index(player, 1)
+    elif action == ACTIONS_MAP["SELL_CHAMPION_POS_3"]:
+        self.sell_champion_at_board_index(player, 2)
+    elif action == ACTIONS_MAP["SELL_CHAMPION_POS_4"]:
+        self.sell_champion_at_board_index(player, 3)
+    elif action == ACTIONS_MAP["SELL_CHAMPION_POS_5"]:
+        self.sell_champion_at_board_index(player, 4)
+    elif action == ACTIONS_MAP["SELL_CHAMPION_POS_6"]:
+        self.sell_champion_at_board_index(player, 5)
+    elif action == ACTIONS_MAP["SELL_CHAMPION_POS_7"]:
+        self.sell_champion_at_board_index(player, 6)
+    elif action == ACTIONS_MAP["SELL_CHAMPION_POS_8"]:
+        self.sell_champion_at_board_index(player, 7)
+    elif action == ACTIONS_MAP["SELL_CHAMPION_POS_9"]:
+        self.sell_champion_at_board_index(player, 8)
