@@ -241,14 +241,18 @@ class GameManager():
             player.gold += champion.sell_value
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
         else:
+            print("---error")
+            print(player.board, board_index)
             raise Exception("tried to sell hero at board index where none existed")
 
     def place_champion_from_bench_to_board(self, player, bench_index):
+        # TODO: swapping requires an empty board/bench slot
         champion = player.bench[bench_index]
         player.bench[bench_index] = None
         player.add_champion_to_board(champion)
 
     def place_champion_from_board_to_bench(self, player, board_index):
+        # TODO: swapping requires an empty bench/bench slot
         champion = player.board[board_index]
         player.board[board_index] = None
         player.add_champion_to_bench(champion)
@@ -296,7 +300,7 @@ class GameManager():
             self.sell_champion_at_board_index(player, 7)
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_9"]:
-            self.sell_champion_at_board_index(player, 9)
+            self.sell_champion_at_board_index(player, 8)
 
         elif action == ACTIONS_MAP["SELL_CHAMPION_POS_1"]:
             self.sell_champion_at_board_index(player, 0)
@@ -390,6 +394,10 @@ class GameManager():
 
         else:
             print("Unrecognized action:", action)
+
+    @property
+    def is_all_players_ready(self):
+        return all([True if player.ready else False for player in self.players])
 
     @property
     def is_creep_round(self):
@@ -567,19 +575,23 @@ class Champion():
         return champions
 
 
-def is_action_legal(board, player, action):
+def is_action_legal(player, action):
+    print("TESTING IF ACTION LEGAL: ", action)
+    if player.is_eliminated:
+        return False
+
     # Player puchasing champ must have a bench slot and enough gold. TODO:
     # technically they can buy if bench is full and buying champ levels champ up
     if action == ACTIONS_MAP["BUY_SHOP_POS_1"]:
-        return (not player.bench_is_full and player.shop[0].cost <= player.gold)
+        return (not player.bench_is_full and player.shop[0] != None and player.shop[0].cost <= player.gold)
     elif action == ACTIONS_MAP["BUY_SHOP_POS_2"]:
-        return (not player.bench_is_full and player.shop[1].cost <= player.gold)
+        return (not player.bench_is_full and player.shop[1] != None and player.shop[1].cost <= player.gold)
     elif action == ACTIONS_MAP["BUY_SHOP_POS_3"]:
-        return (not player.bench_is_full and player.shop[2].cost <= player.gold)
+        return (not player.bench_is_full and player.shop[2] != None and player.shop[2].cost <= player.gold)
     elif action == ACTIONS_MAP["BUY_SHOP_POS_4"]:
-        return (not player.bench_is_full and player.shop[3].cost <= player.gold)
+        return (not player.bench_is_full and player.shop[3] != None and player.shop[3].cost <= player.gold)
     elif action == ACTIONS_MAP["BUY_SHOP_POS_5"]:
-        return (not player.bench_is_full and player.shop[4].cost <= player.gold)
+        return (not player.bench_is_full and player.shop[4] != None and player.shop[4].cost <= player.gold)
 
     # Player can sell bench at position if it is not empty
     elif action == ACTIONS_MAP["SELL_BENCH_POS_1"]:
@@ -603,20 +615,73 @@ def is_action_legal(board, player, action):
 
     # Player can sell champion at board position x if not empty
     elif action == ACTIONS_MAP["SELL_CHAMPION_POS_1"]:
-        self.sell_champion_at_board_index(player, 0)
+        return (player.board[0] != None)
     elif action == ACTIONS_MAP["SELL_CHAMPION_POS_2"]:
-        self.sell_champion_at_board_index(player, 1)
+        return (player.board[1] != None)
     elif action == ACTIONS_MAP["SELL_CHAMPION_POS_3"]:
-        self.sell_champion_at_board_index(player, 2)
+        return (player.board[2] != None)
     elif action == ACTIONS_MAP["SELL_CHAMPION_POS_4"]:
-        self.sell_champion_at_board_index(player, 3)
+        return (player.board[3] != None)
     elif action == ACTIONS_MAP["SELL_CHAMPION_POS_5"]:
-        self.sell_champion_at_board_index(player, 4)
+        return (player.board[4] != None)
     elif action == ACTIONS_MAP["SELL_CHAMPION_POS_6"]:
-        self.sell_champion_at_board_index(player, 5)
+        return (player.board[5] != None)
     elif action == ACTIONS_MAP["SELL_CHAMPION_POS_7"]:
-        self.sell_champion_at_board_index(player, 6)
+        return (player.board[6] != None)
     elif action == ACTIONS_MAP["SELL_CHAMPION_POS_8"]:
-        self.sell_champion_at_board_index(player, 7)
+        return (player.board[7] != None)
     elif action == ACTIONS_MAP["SELL_CHAMPION_POS_9"]:
-        self.sell_champion_at_board_index(player, 8)
+        return (player.board[8] != None)
+
+    # Can move champion on bench to board if board is not full
+    # and the bench champion exists
+    elif action == ACTIONS_MAP["BENCH_1_TO_BOARD"]:
+        return (not player.board_is_full and player.bench[0] != None)
+    elif action == ACTIONS_MAP["BENCH_2_TO_BOARD"]:
+        return (not player.board_is_full and player.bench[1] != None)
+    elif action == ACTIONS_MAP["BENCH_3_TO_BOARD"]:
+        return (not player.board_is_full and player.bench[2] != None)
+    elif action == ACTIONS_MAP["BENCH_4_TO_BOARD"]:
+        return (not player.board_is_full and player.bench[3] != None)
+    elif action == ACTIONS_MAP["BENCH_5_TO_BOARD"]:
+        return (not player.board_is_full and player.bench[4] != None)
+    elif action == ACTIONS_MAP["BENCH_6_TO_BOARD"]:
+        return (not player.board_is_full and player.bench[5] != None)
+    elif action == ACTIONS_MAP["BENCH_7_TO_BOARD"]:
+        return (not player.board_is_full and player.bench[6] != None)
+    elif action == ACTIONS_MAP["BENCH_8_TO_BOARD"]:
+        return (not player.board_is_full and player.bench[7] != None)
+    elif action == ACTIONS_MAP["BENCH_9_TO_BOARD"]:
+        return (not player.board_is_full and player.bench[8] != None)
+
+    # Can move champion on bench to board if bench is not full
+    # and the board champion exists
+    elif action == ACTIONS_MAP["BOARD_1_TO_BENCH"]:
+        return (not player.bench_is_full and player.board[0] != None)
+    elif action == ACTIONS_MAP["BOARD_2_TO_BENCH"]:
+        return (not player.bench_is_full and player.board[1] != None)
+    elif action == ACTIONS_MAP["BOARD_3_TO_BENCH"]:
+        return (not player.bench_is_full and player.board[2] != None)
+    elif action == ACTIONS_MAP["BOARD_4_TO_BENCH"]:
+        return (not player.bench_is_full and player.board[3] != None)
+    elif action == ACTIONS_MAP["BOARD_5_TO_BENCH"]:
+        return (not player.bench_is_full and player.board[4] != None)
+    elif action == ACTIONS_MAP["BOARD_6_TO_BENCH"]:
+        return (not player.bench_is_full and player.board[5] != None)
+    elif action == ACTIONS_MAP["BOARD_7_TO_BENCH"]:
+        return (not player.bench_is_full and player.board[6] != None)
+    elif action == ACTIONS_MAP["BOARD_8_TO_BENCH"]:
+        return (not player.bench_is_full and player.board[7] != None)
+    elif action == ACTIONS_MAP["BOARD_9_TO_BENCH"]:
+        return (not player.bench_is_full and player.board[8] != None)
+
+    elif action == ACTIONS_MAP["REROLL"]:
+        return (player.gold >= 2)
+
+    elif action == ACTIONS_MAP["BUY_EXP"]:
+        return (player.gold >= 4)
+
+    elif action == ACTIONS_MAP["READY_NEXT_STAGE"]:
+        return (not player.ready)
+    else:
+        raise Exception("UNRECOGNIZED ACTION", action)

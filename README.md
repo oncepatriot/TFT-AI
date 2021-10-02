@@ -297,3 +297,7 @@ docker-compose exec app python3 run_data_scraper.py
 docker-compose exec app python3 run_model_trainer.py
 docker-compose exec app python3 test.py -r -e teamfighttactics
 docker-compose exec app python3 train.py -r -e teamfighttactics
+
+
+bash ./scripts/install_env.sh teamfighttactics
+docker-compose exec app python3 train.py -r -e teamfighttactics
