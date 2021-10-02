@@ -1,6 +1,11 @@
 import random
 from . import game_utils
 import numpy as np
+import os
+import sys
+import math
+sys.path.insert(1, os.path.join(sys.path[0], '...'))
+from tft_fight_predictor.teamfight_predictor import TftFightPredictor
 
 
 SET_DATA = {
@@ -70,6 +75,8 @@ class GameManager():
         self.stage = 1
         self.round = 1
         self.champion_pool = self.create_champion_pool()
+        self.fight_predictor = TftFightPredictor()
+        self.placements = []
 
     def create_champion_pool(self):
         champion_pool = {
@@ -123,8 +130,12 @@ class GameManager():
             player.add_exp(2)
 
     def distribute_income(self):
-        for player in self.players:
-            player.gold += player.income
+        if self.stage == 1:
+            for player in self.players: 
+                player.gold += 3
+        else:
+            for player in self.players:
+                player.gold += player.income
 
     def check_game_over(self):
         alive_players = 0
@@ -160,17 +171,44 @@ class GameManager():
             for player in self.players:
                 player.ready = True
             return
-
-        # TODO: actual matchmaking and detect winners
-        for player in self.players:
-            win = random.randint(0,1) == 1
-            player.update_streak(win)
-            if win:
-                player.gold += 1
-            else:
-                player.health = player.health - 20
         
-            player.ready = False
+        alive_players= [player.id for player in self.players if not player.is_eliminated]
+        random.shuffle(alive_players)
+        mm_pairs = [alive_players[i:i + 2] for i in range(0, len(alive_players), 2)] # create pairs
+
+        for pair in mm_pairs:
+            player_one = self.players[pair[0]]
+            player_two = self.players[pair[1]]
+
+
+            p1_win_probability, p2_win_probability = self.fight_predictor.predict_tft_fight(
+                player_one,
+                player_two
+            )
+
+            if p1_win_probability > .5:
+                win = True
+                player_one.update_streak(1)
+                player_one.gold += 1
+            else:
+                player_two.update_streak(-1)
+                player_two.health -= self.stage_damage
+
+                # Approximate number of units lost by. Examples:
+                # .8 * 4 units on board = 3.2 = 3 unit loss
+                # .5 * 4 units on board = 2 unit loss
+                # .8 * 8 units on board = 6.4 = 6 unit loss
+                # .5 * 8 units on board = 4 = 4 unit loss
+                units_lost_by = math.floor(p1_win_probability * player_one.num_units_on_board) - random.randint(0,1)
+                player_two.health -= self.get_damage_for_x_unit_loss(units_lost_by)
+
+            if player_one.is_eliminated:
+                self.placements.prepend(player_one)
+            if player_two.is_eliminated:
+                self.placements.prepend(player_two)
+
+            player_one.ready = False
+            player_two.ready = False
 
     def purchase_champion_at_shop_index(self, player, shop_index):
         # TODO: Player can buy champ if bench is full but buying will
@@ -187,12 +225,20 @@ class GameManager():
             player.gold = player.gold - champion.cost
             player.shop[shop_index] = None
             player.add_champion_to_bench(champion)
-            self.champion_pool[champion.cost].remove(champion)
+            self.remove_champion_from_pool(champion)
             self.maybe_upgrade_champions_for_player(player, champion)
         else:
             raise Exception("tried to buy champ couldnt afford")
 
         return
+
+    def remove_champion_from_pool(self, champion):
+        for i, champ in enumerate(self.champion_pool[champion.cost]):
+            if champ.id == champion.id:
+                del self.champion_pool[champion.cost][i]
+                return
+
+        raise Exception("Did not found champ in pool to remove!")
 
     def maybe_upgrade_champions_for_player(self, player, champion):
         bench = player.bench
@@ -231,19 +277,19 @@ class GameManager():
             player.bench[bench_index] = None
             player.gold += champion.sell_value
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
+            player.sort_units_to_front()
         else:
-            raise Exception("tried to sell hero at bench index where none existed")
+            raise Exception("tried to sell hero at bench index where none existed", player.id)
 
     def sell_champion_at_board_index(self, player, board_index):
         champion = player.board[board_index]
         if champion:
-            player.bench[bench_index] == None
+            player.board[board_index] = None
             player.gold += champion.sell_value
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
+            player.sort_units_to_front()
         else:
-            print("---error")
-            print(player.board, board_index)
-            raise Exception("tried to sell hero at board index where none existed")
+            raise Exception("tried to sell hero at board index where none existed", player.id)
 
     def place_champion_from_bench_to_board(self, player, bench_index):
         # TODO: swapping requires an empty board/bench slot
@@ -259,7 +305,6 @@ class GameManager():
 
     # action - int - action integer
     def execute_agent_action(self, player, action):
-        print("EXECUTING AGENT ACTION", player.id, action)
         if action == ACTIONS_MAP["BUY_SHOP_POS_1"]:
             self.purchase_champion_at_shop_index(player,0)
 
@@ -276,31 +321,31 @@ class GameManager():
             self.purchase_champion_at_shop_index(player,4)        
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_1"]:
-            self.sell_champion_at_board_index(player, 0)
+            self.sell_champion_at_bench_index(player, 0)
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_2"]:
-            self.sell_champion_at_board_index(player, 1)
+            self.sell_champion_at_bench_index(player, 1)
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_3"]:
-            self.sell_champion_at_board_index(player, 2)
+            self.sell_champion_at_bench_index(player, 2)
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_4"]:
-            self.sell_champion_at_board_index(player, 3)
+            self.sell_champion_at_bench_index(player, 3)
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_5"]:
-            self.sell_champion_at_board_index(player, 4)
+            self.sell_champion_at_bench_index(player, 4)
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_6"]:
-            self.sell_champion_at_board_index(player, 5)  
+            self.sell_champion_at_bench_index(player, 5)  
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_7"]:
-            self.sell_champion_at_board_index(player, 6)
+            self.sell_champion_at_bench_index(player, 6)
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_8"]:
-            self.sell_champion_at_board_index(player, 7)
+            self.sell_champion_at_bench_index(player, 7)
 
         elif action == ACTIONS_MAP["SELL_BENCH_POS_9"]:
-            self.sell_champion_at_board_index(player, 8)
+            self.sell_champion_at_bench_index(player, 8)
 
         elif action == ACTIONS_MAP["SELL_CHAMPION_POS_1"]:
             self.sell_champion_at_board_index(player, 0)
@@ -409,6 +454,15 @@ class GameManager():
         
         return False
 
+    @property
+    def stage_damage(self):
+        stage_to_damage = [0,0,2,3,5,8,15]
+        return stage_to_damage[self.stage-1]
+    
+    def get_damage_for_x_unit_loss(self, num_units):
+        x_unit_lost_damage = [0, 2, 4, 6, 8, 10, 11, 12, 13, 14, 15]
+        return x_unit_lost_damage[num_units]
+
     def print_board_state(self):
         print("====================")
         print("Game State")
@@ -430,7 +484,7 @@ class Player():
         self.bench = [None]*9
         self.health = 100
         self.ready = False
-        self.items = []
+        self.items = [0]*9
         self.streak = 0 # negative is lose streak, positive is win streak
 
     def buy_exp(self):
@@ -492,12 +546,14 @@ class Player():
         for i, bench_occupant in enumerate(self.bench):
             if bench_occupant == None:
                 self.bench[i] = champion
+                self.sort_units_to_front()
                 return
 
     def add_champion_to_board(self, champion):
         for i, board_occupant in enumerate(self.board):
             if board_occupant == None:
                 self.board[i] = champion
+                self.sort_units_to_front()
                 return
 
     @property
@@ -530,6 +586,14 @@ class Player():
     def is_eliminated(self):
         return self.health <= 0
     
+    @property
+    def num_units_on_board(self):
+        return len([i for i in self.board if i])
+    
+    def sort_units_to_front(self):
+        sorted(self.board, key=lambda c: 0 if c == None else 1)
+        sorted(self.bench, key=lambda c: 0 if c == None else 1)
+
     def print_player(self):
         print(f"Player: {self.id} | Level: {self.level} | Exp: {self.exp} | Health: {self.health} | Gold: {self.gold} | Streak: {self.streak}")
         print("Board:", [str(c) for c in self.board])
@@ -545,7 +609,7 @@ class Champion():
         self.name = name
         self.cost = cost
         self.traits = traits
-        self.items = []
+        self.items = [0] * 3 # array of item_ids (1532)
 
     def __str__(self):
         return f"Level {self.level} {self.id}"
@@ -575,8 +639,8 @@ class Champion():
         return champions
 
 
+
 def is_action_legal(player, action):
-    print("TESTING IF ACTION LEGAL: ", action)
     if player.is_eliminated:
         return False
 

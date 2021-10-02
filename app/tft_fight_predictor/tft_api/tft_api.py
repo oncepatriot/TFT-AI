@@ -10,27 +10,28 @@ import time
 
 TEST_PUUID = "8o6dOaqtLQEni0LoLCCEr_VV8Q_vpKiWyjdB1hqvFbQctqTWLhI8v6F2afau2xyRiGAXx6EWKzetTg" #RamKev
 TEST_MATCH_ID = "NA1_4055205965"
-API_KEY = "RGAPI-9c210b84-88ac-4f60-95cb-ec8e97e4bf5f"
-
+API_KEY = "RGAPI-e8eca384-e0ae-4afb-baa7-6c73ba726ac0"
+TEMP_API_KEY = "RGAPI-2f66cfaa-e70c-4b6d-afe4-12a8d1a77520"
 
 def get_match_ids_by_puuid(puuid):
-    r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/{puuid}/ids?count=50&api_key={API_KEY}")
+    r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/{puuid}/ids?count=50&api_key={TEMP_API_KEY}")
     match_ids = r.json()
     return match_ids
 
 def get_match_by_match_id(match_id):
-    r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/{match_id}?api_key={API_KEY}")
+    r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/{match_id}?api_key={TEMP_API_KEY}")
     return r.json()
 
 def run_match_data_scraper():
     player_puuids = [TEST_PUUID]
     match_ids_processed = {}
     while True:   
-        time.sleep(15)
+        time.sleep(2)
         print("Getting match ids by puuid:")
         puuid = player_puuids.pop(0)
 
         match_ids = get_match_ids_by_puuid(puuid)
+        print(match_ids)
         match_ids = random.sample(match_ids, 10)
 
         for match_id in match_ids:
@@ -43,16 +44,15 @@ def run_match_data_scraper():
                 print("Processing Match Data: ", match_id)
                 process_match_data_and_add_to_training_data_set(match_data)
                 match_ids_processed[match_id] = True
-                time.sleep(15)
+                time.sleep(10)
             else:
                 continue
 
 def process_match_data_and_add_to_training_data_set(match_data):
-	"""
-	Periodically query Riot TFT API for match data to process and
-	add to training data. TODO: Separate the processing into smaller functions
-	
-	"""
+    """
+    Periodically query Riot TFT API for match data to process and
+    add to training data. TODO: Separate the processing into smaller functions
+    """
 
     # TODO: DOES NOT HANDLE 10/11/12 UNITS FROM FONS?
     players = match_data["info"]["participants"]
@@ -85,10 +85,10 @@ def process_match_data_and_add_to_training_data_set(match_data):
             # Randomize whether to add to data set to not influence
             # model too much that more unit = win
             if random.randint(0,100) < 15:
-	            if random.randint(0, 1) == 1:
-	                match_pairs.append([0, stronger, weaker])
-	            else:
-	                match_pairs.append([1, weaker, stronger])
+                if random.randint(0, 1) == 1:
+                    match_pairs.append([0, stronger, weaker])
+                else:
+                    match_pairs.append([1, weaker, stronger])
 
     rows = []
     for match_pair in match_pairs:

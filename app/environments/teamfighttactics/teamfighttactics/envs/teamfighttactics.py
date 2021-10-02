@@ -70,7 +70,12 @@ class TeamfightTacticsEnv(gym.Env):
             reward = [1.0/(self.n_players-1)] * self.n_players
             reward[self.current_player_num] = -1
         else:
-            self.game_manager.execute_agent_action(self.current_player, action)
+            try:
+                self.game_manager.execute_agent_action(self.current_player, action)
+            except Exception as e:
+                print(e)
+                print(self.game_manager.print_board_state())
+                raise Exception("Error executing game action")
      
         # Update current player to the next player
         self.current_player_num = (self.current_player_num + 1) % self.n_players
@@ -86,12 +91,27 @@ class TeamfightTacticsEnv(gym.Env):
             self.game_manager.increment_stage_round()
             self.game_manager.roll_all_players_shops()
 
-            if self.game_manager.check_game_over():
-                print("==========")
-                print("GAME OVER")
-                print("FINAL BOARD STATE:")
-                print(self.game_manager.print_board_state())
-                done = True
+            # Distribute reward if a player has 4+ win streak
+            for i, player in enumerate(self.players):
+                if player.streak >= 4:
+                    reward[i] += .2
+
+
+        if self.game_manager.check_game_over():
+            print("==========")
+            print("GAME OVER")
+            print("FINAL BOARD STATE:")
+            print(self.game_manager.print_board_state())
+            print("==========")
+            print("FINAL PLACEMENTS:")
+            print(self.game_manager.placements)
+            # Distribute rewards based on placement
+            for place, player_id in enumerate(self.game_manager.placements):
+                place_to_reward = [10,6,4,2,-2,-4,-6,-8]
+                reward[player_id] = place_to_reward[place]
+
+            print("REWARDS:", reward)
+            done = True
 
         return self.observation, reward, done, {}
 
@@ -102,14 +122,14 @@ class TeamfightTacticsEnv(gym.Env):
         print("CALLED RESET")
         self.current_player_num = 0
         self.players = [
-            Player('0'),
-            Player('1'),
-            Player('2'),
-            Player('3'),
-            Player('4'),
-            Player('5'),
-            Player('6'),
-            Player('7')
+            Player(0),
+            Player(1),
+            Player(2),
+            Player(3),
+            Player(4),
+            Player(5),
+            Player(6),
+            Player(7)
         ]
         self.game_manager = GameManager(self.players)
         self.game_manager.create_champion_pool()
@@ -123,7 +143,9 @@ class TeamfightTacticsEnv(gym.Env):
         """The `render` function is called to output a visual or human readable
          summary of the current game state to the log file.
         """
-        self.game_manager.print_board_state()
+        if self.game_manager.is_all_players_ready:
+            print("All players ready with following board state:")
+            self.game_manager.print_board_state()
         return
 
     @property
