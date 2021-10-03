@@ -3,6 +3,7 @@
     "name": "Aatrox",
     "championId": "TFT5_Aatrox",
     "cost": 1,
+    "id": 1,
     "traits": [
       "Set5_Redeemed",
       "Set5_Legionnaire"
@@ -12,6 +13,7 @@
     "name": "Akshan",
     "championId": "TFT5_Akshan",
     "cost": 5,
+    "id": 2,
     "traits": [
       "Set5_Sentinel",
       "Set5_Ranger"
@@ -21,6 +23,7 @@
     "name": "Aphelios",
     "championId": "TFT5_Aphelios",
     "cost": 4,
+    "id": 3,
     "traits": [
       "Set5_Nightbringer",
       "Set5_Ranger"
@@ -30,6 +33,7 @@
     "name": "Ashe",
     "championId": "TFT5_Ashe",
     "cost": 3,
+    "id": 4,
     "traits": [
       "Set5_Draconic",
       "Set5_Ranger"
@@ -39,6 +43,7 @@
     "name": "Brand",
     "championId": "TFT5_Brand",
     "cost": 2,
+    "id": 5,
     "traits": [
       "Set5_Abomination",
       "Set5_Spellweaver"
@@ -48,6 +53,7 @@
     "name": "Diana",
     "championId": "TFT5_Diana",
     "cost": 4,
+    "id": 6,
     "traits": [
       "Set5_Nightbringer",
       "Set5_Assassin"
@@ -57,6 +63,7 @@
     "name": "Draven",
     "championId": "TFT5_Draven",
     "cost": 4,
+    "id": 7,
     "traits": [
       "Set5_Forgotten",
       "Set5_Legionnaire"
@@ -66,6 +73,7 @@
     "name": "Fiddlesticks",
     "championId": "TFT5_Fiddlesticks",
     "cost": 4,
+    "id": 8,
     "traits": [
       "Set5_Abomination",
       "Set5_Revenant",
@@ -76,6 +84,7 @@
     "name": "Galio",
     "championId": "TFT5_Galio",
     "cost": 4,
+    "id": 9,
     "traits": [
       "Set5_Draconic",
       "Set5_Sentinel",
@@ -86,6 +95,7 @@
     "name": "Garen",
     "championId": "TFT5_Garen",
     "cost": 5,
+    "id": 10,
     "traits": [
       "Set5_Victorious",
       "Set5_Dawnbringer",
@@ -96,6 +106,7 @@
     "name": "Gragas",
     "championId": "TFT5_Gragas",
     "cost": 1,
+    "id": 11,
     "traits": [
       "Set5_Dawnbringer",
       "Set5_Brawler"
@@ -105,6 +116,7 @@
     "name": "Gwen",
     "championId": "TFT5_Gwen",
     "cost": 5,
+    "id": 12,
     "traits": [
       "Set5_Inanimate",
       "Set5_Mystic"
@@ -114,6 +126,7 @@
     "name": "Hecarim",
     "championId": "TFT5_Hecarim",
     "cost": 2,
+    "id":13,
     "traits": [
       "Set5_Forgotten",
       "Set5_Cavalier"
@@ -123,6 +136,7 @@
     "name": "Heimerdinger",
     "championId": "TFT5_Heimerdinger",
     "cost": 5,
+    "id": 14,
     "traits": [
       "Set5_Draconic",
       "Set5_Renewer",
@@ -133,6 +147,7 @@
     "name": "Ivern",
     "championId": "TFT5_Ivern",
     "cost": 4,
+    "id": 15,
     "traits": [
       "Set5_Revenant",
       "Set5_Invoker",
@@ -143,6 +158,7 @@
     "name": "Irelia",
     "championId": "TFT5_Irelia",
     "cost": 2,
+    "id": 16,
     "traits": [
       "Set5_Sentinel",
       "Set5_Skirmisher",
@@ -153,6 +169,7 @@
     "name": "Jax",
     "championId": "TFT5_Jax",
     "cost": 4,
+    "id": 17,
     "traits": [
       "Set5_Ironclad",
       "Set5_Skirmisher"
@@ -162,6 +179,7 @@
     "name": "Kalista",
     "championId": "TFT5_Kalista",
     "cost": 1,
+    "id": 18,
     "traits": [
       "Set5_Abomination",
       "Set5_Legionnaire"
@@ -171,6 +189,7 @@
     "name": "Karma",
     "championId": "TFT5_Karma",
     "cost": 4,
+    "id": 19,
     "traits": [
       "Set5_Dawnbringer",
       "Set5_Invoker"
@@ -180,6 +199,7 @@
     "name": "Kayle",
     "championId": "TFT5_Kayle",
     "cost": 5,
+    "id": 20,
     "traits": [
       "Set5_Redeemed",
       "Set5_Legionnaire"
@@ -189,6 +209,7 @@
     "name": "Kennen",
     "championId": "TFT5_Kennen",
     "cost": 2,
+    "id": 21,
     "traits": [
       "Set5_Hellion",
       "Set5_Skirmisher"
@@ -198,6 +219,7 @@
     "name": "Kha'Zix",
     "championId": "TFT5_Khazix",
     "cost": 1,
+    "id": 22,
     "traits": [
       "Set5_Dawnbringer",
       "Set5_Assassin"
@@ -207,6 +229,7 @@
     "name": "Kled",
     "championId": "TFT5_Kled",
     "cost": 1,
+    "id": 23,
     "traits": [
       "Set5_Hellion",
       "Set5_Cavalier"
@@ -216,6 +239,7 @@
     "name": "Lee Sin",
     "championId": "TFT5_LeeSin",
     "cost": 3,
+    "id": 24,
     "traits": [
       "Set5_Nightbringer",
       "Set5_Skirmisher"
@@ -225,6 +249,7 @@
     "name": "Leona",
     "championId": "TFT5_Leona",
     "cost": 1,
+    "id": 25,
     "traits": [
       "Set5_Redeemed",
       "Set5_Knight"
@@ -234,6 +259,7 @@
     "name": "Lucian",
     "championId": "TFT5_Lucian",
     "cost": 4,
+    "id": 26,
     "traits": [
       "Set5_Sentinel",
       "Set5_Cannoneer"
@@ -243,6 +269,7 @@
     "name": "Lulu",
     "championId": "TFT5_Lulu",
     "cost": 3,
+    "id": 27,
     "traits": [
       "Set5_Hellion",
       "Set5_Mystic"
@@ -252,6 +279,7 @@
     "name": "Lux",
     "championId": "TFT5_Lux",
     "cost": 3,
+    "id": 28,
     "traits": [
       "Set5_Redeemed",
       "Set5_Mystic"
@@ -261,6 +289,7 @@
     "name": "Miss Fortune",
     "championId": "TFT5_MissFortune",
     "cost": 3,
+    "id": 29,
     "traits": [
       "Set5_Forgotten",
       "Set5_Cannoneer"
@@ -270,6 +299,7 @@
     "name": "Nautilus",
     "championId": "TFT5_Nautilus",
     "cost": 2,
+    "id": 30,
     "traits": [
       "Set5_Ironclad",
       "Set5_Knight"
@@ -279,6 +309,7 @@
     "name": "Nidalee",
     "championId": "TFT5_Nidalee",
     "cost": 3,
+    "id": 31,
     "traits": [
       "Set5_Dawnbringer",
       "Set5_Skirmisher"
@@ -288,6 +319,7 @@
     "name": "Nocturne",
     "championId": "TFT5_Nocturne",
     "cost": 3,
+    "id": 32,
     "traits": [
       "Set5_Revenant",
       "Set5_Assassin"
@@ -297,6 +329,7 @@
     "name": "Nunu",
     "championId": "TFT5_Nunu",
     "cost": 3,
+    "id": 33,
     "traits": [
       "Set5_Abomination",
       "Set5_Brawler"
@@ -306,6 +339,7 @@
     "name": "Olaf",
     "championId": "TFT5_Olaf",
     "cost": 1,
+    "id": 34,
     "traits": [
       "Set5_Sentinel",
       "Set5_Skirmisher"
@@ -315,6 +349,7 @@
     "name": "Poppy",
     "championId": "TFT5_Poppy",
     "cost": 1,
+    "id": 35,
     "traits": [
       "Set5_Hellion",
       "Set5_Knight"
@@ -324,6 +359,7 @@
     "name": "Pyke",
     "championId": "TFT5_Pyke",
     "cost": 2,
+    "id": 36,
     "traits": [
       "Set5_Sentinel",
       "Set5_Assassin"
@@ -333,6 +369,7 @@
     "name": "Rakan",
     "championId": "TFT5_Rakan",
     "cost": 3,
+    "id": 37,
     "traits": [
       "Set5_Sentinel",
       "Set5_Renewer"
@@ -342,6 +379,7 @@
     "name": "Rell",
     "championId": "TFT5_Rell",
     "cost": 4,
+    "id": 38,
     "traits": [
       "Set5_Redeemed",
       "Set5_Ironclad",
@@ -352,6 +390,7 @@
     "name": "Riven",
     "championId": "TFT5_Riven",
     "cost": 3,
+    "id": 39,
     "traits": [
       "Set5_Dawnbringer",
       "Set5_Legionnaire"
@@ -361,6 +400,7 @@
     "name": "Sejuani",
     "championId": "TFT5_Sejuani",
     "cost": 2,
+    "id": 40,
     "traits": [
       "Set5_Brawler",
       "Set5_Nightbringer",
@@ -371,6 +411,7 @@
     "name": "Senna",
     "championId": "TFT5_Senna",
     "cost": 1,
+    "id": 41,
     "traits": [
       "Set5_Sentinel",
       "Set5_Cannoneer"
@@ -380,6 +421,7 @@
     "name": "Sett",
     "championId": "TFT5_Sett",
     "cost": 2,
+    "id": 42,
     "traits": [
       "Set5_Draconic",
       "Set5_Brawler"
@@ -389,6 +431,7 @@
     "name": "Soraka",
     "championId": "TFT5_Soraka",
     "cost": 2,
+    "id": 43,
     "traits": [
       "Set5_Dawnbringer",
       "Set5_Renewer"
@@ -398,6 +441,7 @@
     "name": "Syndra",
     "championId": "TFT5_Syndra",
     "cost": 2,
+    "id": 44,
     "traits": [
       "Set5_Redeemed",
       "Set5_Invoker"
@@ -407,6 +451,7 @@
     "name": "Teemo",
     "championId": "TFT5_Teemo",
     "cost": 5,
+    "id": 45,
     "traits": [
       "Set5_Cruel",
       "Set5_Hellion",
@@ -417,6 +462,7 @@
     "name": "Thresh",
     "championId": "TFT5_Thresh",
     "cost": 2,
+    "id": 46,
     "traits": [
       "Set5_Forgotten",
       "Set5_Knight"
@@ -426,6 +472,7 @@
     "name": "Tristana",
     "championId": "TFT5_Tristana",
     "cost": 2,
+    "id": 47,
     "traits": [
       "Set5_Hellion",
       "Set5_Cannoneer"
@@ -435,6 +482,7 @@
     "name": "Udyr",
     "championId": "TFT5_Udyr",
     "cost": 1,
+    "id": 48,
     "traits": [
       "Set5_Draconic",
       "Set5_Skirmisher"
@@ -444,6 +492,7 @@
     "name": "Varus",
     "championId": "TFT5_Varus",
     "cost": 2,
+    "id": 49,
     "traits": [
       "Set5_Redeemed",
       "Set5_Ranger"
@@ -453,6 +502,7 @@
     "name": "Vayne",
     "championId": "TFT5_Vayne",
     "cost": 1,
+    "id": 50,
     "traits": [
       "Set5_Forgotten",
       "Set5_Ranger"
@@ -462,6 +512,7 @@
     "name": "Vel'Koz",
     "championId": "TFT5_Velkoz",
     "cost": 4,
+    "id": 51,
     "traits": [
       "Set5_Redeemed",
       "Set5_Spellweaver"
@@ -471,6 +522,7 @@
     "name": "Viego",
     "championId": "TFT5_Viego",
     "cost": 5,
+    "id": 52,
     "traits": [
       "Set5_Forgotten",
       "Set5_Skirmisher",
@@ -481,6 +533,7 @@
     "name": "Vladimir",
     "championId": "TFT5_Vladimir",
     "cost": 1,
+    "id": 53,
     "traits": [
       "Set5_Nightbringer",
       "Set5_Renewer"
@@ -490,6 +543,7 @@
     "name": "Volibear",
     "championId": "TFT5_Volibear",
     "cost": 5,
+    "id": 54,
     "traits": [
       "Set5_Revenant",
       "Set5_Brawler"
@@ -499,6 +553,7 @@
     "name": "Yasuo",
     "championId": "TFT5_Yasuo",
     "cost": 3,
+    "id": 55,
     "traits": [
       "Set5_Nightbringer",
       "Set5_Legionnaire"
@@ -508,6 +563,7 @@
     "name": "Ziggs",
     "championId": "TFT5_Ziggs",
     "cost": 1,
+    "id": 56,
     "traits": [
       "Set5_Hellion",
       "Set5_Spellweaver"
@@ -517,6 +573,7 @@
     "name": "Zyra",
     "championId": "TFT5_Zyra",
     "cost": 3,
+    "id": 57,
     "traits": [
       "Set5_Draconic",
       "Set5_Spellweaver"

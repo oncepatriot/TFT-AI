@@ -15,12 +15,12 @@ class TeamfightTacticsEnv(gym.Env):
         self.n_players = 8
 
         # Vector of all actions available to an agent
-        self.action_space = gym.spaces.Discrete(len(ACTIONS_MAP.keys()))
+        self.action_space = gym.spaces.Discrete(len(ACTIONS_MAP.keys())) # 44 for now...
 
         # For now, agent only sees all of their tft "board" state such as
         # gold, champion bench, shop, champions. More advanced implementation
         # would allow each agent to see all player's board states.
-        self.observation_space = gym.spaces.Box(0, 1, (44,))
+        self.observation_space = gym.spaces.Box(0, 1, (27,))
 
         # self.players is defined in base class
         self.current_player_num = 0
@@ -38,16 +38,18 @@ class TeamfightTacticsEnv(gym.Env):
         from the perspective of the current player, where each element
         of the array is in the range `[-1,1]`.
         """
-        health = self.current_player.health
-        gold = self.current_player.gold
-        level = self.current_player.level
-        experience = self.current_player.exp
-
-        shop_list = self.current_player.shop
-        bench = self.current_player.bench
-        board = self.current_player.board
-
-        return np.zeros(44)
+        obs = [
+            self.current_player.health, 
+            self.current_player.gold,
+            self.current_player.level,
+            self.current_player.exp
+        ]
+        obs += [c.id if c else 0 for c in self.current_player.shop]
+        obs += [c.id if c else 0 for c in self.current_player.bench]
+        obs += [c.id if c else 0 for c in self.current_player.board]
+        print(len(obs))
+        # return obs
+        return np.zeros(27)
 
     def step(self, action):
         """The `step` method accepts an `action` from the current active player and performs the
@@ -62,10 +64,8 @@ class TeamfightTacticsEnv(gym.Env):
 
         reward = [0.0] * self.n_players
 
-
         # VALIDATE ACTIONS... Money to buy, If ready cant perform any actions.
         # punish taking actions that are invalid
-
         if self.legal_actions[action] == 0:
             reward = [1.0/(self.n_players-1)] * self.n_players
             reward[self.current_player_num] = -1
@@ -86,6 +86,7 @@ class TeamfightTacticsEnv(gym.Env):
         # Eliminate dead players
         # End game if last player standing
         if self.game_manager.is_all_players_ready:
+            print("all players ready")
             self.game_manager.simulate_combat_step()
             self.game_manager.distribute_income()
             self.game_manager.increment_stage_round()
@@ -143,9 +144,7 @@ class TeamfightTacticsEnv(gym.Env):
         """The `render` function is called to output a visual or human readable
          summary of the current game state to the log file.
         """
-        if self.game_manager.is_all_players_ready:
-            print("All players ready with following board state:")
-            self.game_manager.print_board_state()
+        # self.game_manager.print_board_state()
         return
 
     @property

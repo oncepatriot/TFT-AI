@@ -6,6 +6,7 @@ import sys
 import math
 sys.path.insert(1, os.path.join(sys.path[0], '...'))
 from tft_fight_predictor.teamfight_predictor import TftFightPredictor
+from copy import deepcopy
 
 
 SET_DATA = {
@@ -90,23 +91,23 @@ class GameManager():
         # TIER 1: 29 of each champ
         for champ in game_utils.get_cost_x_champions(1):
             for i in range(29):
-                champion_pool[1].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
+                champion_pool[1].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits'], champ['id']))
 
         for champ in game_utils.get_cost_x_champions(2):
             for i in range(22):
-                champion_pool[2].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
+                champion_pool[2].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits'], champ['id']))
         
         for champ in game_utils.get_cost_x_champions(3):
             for i in range(18):
-                champion_pool[3].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
+                champion_pool[3].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits'], champ['id']))
                 
         for champ in game_utils.get_cost_x_champions(4):
             for i in range(12):
-                champion_pool[4].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
+                champion_pool[4].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits'], champ['id']))
         
         for champ in game_utils.get_cost_x_champions(5):
             for i in range(10):
-                champion_pool[5].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
+                champion_pool[5].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits'], champ['id']))
 
         return champion_pool
 
@@ -172,15 +173,21 @@ class GameManager():
                 player.ready = True
             return
         
-        alive_players= [player.id for player in self.players if not player.is_eliminated]
+        alive_players = [player for player in self.players if not player.is_eliminated]
         random.shuffle(alive_players)
+        if (len(alive_players) % 2) != 0:
+            print("need to add ghost player")
+            print(alive_players)
+            ghost_player = deepcopy(alive_players[-1])
+            alive_players.append(ghost_player)
+            print(alive_players)
+
         mm_pairs = [alive_players[i:i + 2] for i in range(0, len(alive_players), 2)] # create pairs
 
         # TODO: If odd number of players, will need to create a ghost...
         for pair in mm_pairs:
-            player_one = self.players[pair[0]]
-            player_two = self.players[pair[1]]
-            print(player_one.id, player_two.id)
+            player_one = pair[0]
+            player_two = pair[1]
 
             p1_win_probability, p2_win_probability = self.fight_predictor.predict_tft_fight(
                 player_one,
@@ -263,13 +270,13 @@ class GameManager():
                 board_locations.append(index)
 
         if num_champs == 3:
-            print("Upgrading champion for player:", player, champion.id)
+            print("Upgrading champion for player:", player, champion.champion_id)
             for b in bench_locations:
                 player.bench[b] = None
             for b in board_locations:
                 player.board[b] = None
 
-            upgraded_champ = Champion(champion.id, champion.name, champion.level + 1, champion.cost, champion.traits)
+            upgraded_champ = Champion(champion.champion_id, champion.name, champion.level + 1, champion.cost, champion.traits, champion.id)
             player.add_champion_to_bench(upgraded_champ)
             self.maybe_upgrade_champions_for_player(player, champion) # Check again for double upgrade
 
@@ -490,6 +497,10 @@ class Player():
         self.items = [0]*9
         self.streak = 0 # negative is lose streak, positive is win streak
 
+        # Metric count actions since last ready, maybe use this 
+        # to deprioritize taking useless actions back and forth?
+        self.actions_since_last_ready = 0
+
     def buy_exp(self):
         if self.gold < 4:
             raise Exception("Tried to buy exp without enough gold")
@@ -602,16 +613,17 @@ class Player():
 
 
 class Champion():
-    def __init__(self, id, name, level, cost, traits):
-        self.id = id
+    def __init__(self, champion_id, name, level, cost, traits, id):
+        self.champion_id = champion_id
         self.level = level
         self.name = name
         self.cost = cost
         self.traits = traits
         self.items = [0] * 3 # array of item_ids (1532)
+        self.id = id
 
     def __str__(self):
-        return f"Level {self.level} {self.id}"
+        return f"Level {self.level} {self.champion_id}"
 
     def is_same_level_and_champ(self, champ):
         return self.level == champ.level and self.id == champ.id
@@ -627,13 +639,13 @@ class Champion():
     def champions_to_return_to_pool_when_sold(self):
         champions = []
         if self.level == 1:
-            champions.append(Champion(self.id, self.name, 1, self.cost, self.traits))
+            champions.append(Champion(self.champion_id, self.name, 1, self.cost, self.traits, self.id))
         elif self.level == 2:
             for i in range(3):
-                champions.append(Champion(self.id, self.name, 1, self.cost, self.traits))
+                champions.append(Champion(self.champion_id, self.name, 1, self.cost, self.traits, self.id))
         elif self.level == 3:
             for i in range(9):
-                champions.append(Champion(self.id, self.name, 1, self.cost, self.traits))
+                champions.append(Champion(self.champion_id, self.name, 1, self.cost, self.traits, self.id))
 
         return champions
 
