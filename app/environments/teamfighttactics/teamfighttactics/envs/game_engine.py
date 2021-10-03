@@ -648,9 +648,6 @@ class Champion():
 
 
 def is_action_legal(player, action):
-    if player.is_eliminated:
-        return False
-
     # Player puchasing champ must have a bench slot and enough gold. TODO:
     # technically they can buy if bench is full and buying champ levels champ up
     if action == ACTIONS_MAP["BUY_SHOP_POS_1"]:
@@ -753,6 +750,6 @@ def is_action_legal(player, action):
         return (player.gold >= 4 and player.level < 9)
 
     elif action == ACTIONS_MAP["READY_NEXT_STAGE"]:
-        return (not player.ready)
+        return True
     else:
         raise Exception("UNRECOGNIZED ACTION", action)

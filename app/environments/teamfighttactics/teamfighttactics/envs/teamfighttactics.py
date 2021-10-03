@@ -40,7 +40,6 @@ class TeamfightTacticsEnv(gym.Env):
         self.game_manager = None
         self.champion_pool = []
 
-        self.iteration = 0
 
     @property
     def observation(self):
@@ -86,14 +85,10 @@ class TeamfightTacticsEnv(gym.Env):
         Arguments:
             action - int - Action integer that maps to an action in the action space
         """
+        print(self.current_player_num, action)
         done = False
-
         reward = [0.0] * self.n_players
-
-        self.iteration += 1
-        if self.iteration > 100:
-            self.game_manager.print_board_state()
-
+        
 
         # VALIDATE ACTIONS... Money to buy, If ready cant perform any actions.
         # punish taking actions that are invalid
@@ -102,50 +97,53 @@ class TeamfightTacticsEnv(gym.Env):
             reward[self.current_player_num] = -1
         else:
             try:
-                self.game_manager.execute_agent_action(self.current_player, action)
+                if not self.current_player.is_eliminated:
+                    self.game_manager.execute_agent_action(self.current_player, action)
             except Exception as e:
-                print(e)
+                print("ERROR EXECUTING ACTION", e)
                 print(self.game_manager.print_board_state())
                 raise Exception("Error executing game action")
-     
+
+            # IF ALL PLAYERS ARE READY:
+            # Calculate "combat math" based on all players current boards.
+            # Matchmake players against one another, subtract healths
+            # Eliminate dead players
+            # End game if last player standing
+            if self.game_manager.is_all_players_ready:
+                print("all players ready")
+                self.game_manager.increment_stage_round()
+                self.game_manager.simulate_combat_step()
+                self.game_manager.distribute_income()
+                self.game_manager.roll_all_players_shops()
+                self.game_manager.print_board_state()
+
+
+                # Distribute reward if a player has 4+ win streak
+                for i, player in enumerate(self.players):
+                    if player.streak >= 4:
+                        reward[i] += .15
+
+
+            if self.game_manager.check_game_over():
+                print("==========")
+                print("GAME OVER")
+                print("FINAL BOARD STATE:")
+                print(self.game_manager.print_board_state())
+                print("==========")
+                print("FINAL PLACEMENTS:")
+                print(self.game_manager.placements)
+                # Distribute rewards based on placement
+                for place, player_id in enumerate(self.game_manager.placements):
+                    place_to_reward = [10,6,4,2,-2,-4,-6,-8]
+                    reward[player_id] = place_to_reward[place]
+
+                print("REWARDS:", reward)
+                done = True
+
         # Update current player to the next player
         self.current_player_num = (self.current_player_num + 1) % self.n_players
 
-        # IF ALL PLAYERS ARE READY:
-        # Calculate "combat math" based on all players current boards.
-        # Matchmake players against one another, subtract healths
-        # Eliminate dead players
-        # End game if last player standing
-        if self.game_manager.is_all_players_ready:
-            print("all players ready")
-            self.game_manager.simulate_combat_step()
-            self.game_manager.distribute_income()
-            self.game_manager.increment_stage_round()
-            self.game_manager.roll_all_players_shops()
-
-            # Distribute reward if a player has 4+ win streak
-            for i, player in enumerate(self.players):
-                if player.streak >= 4:
-                    reward[i] += .2
-
-
-        if self.game_manager.check_game_over():
-            self.iteration = 0
-            print("==========")
-            print("GAME OVER")
-            print("FINAL BOARD STATE:")
-            print(self.game_manager.print_board_state())
-            print("==========")
-            print("FINAL PLACEMENTS:")
-            print(self.game_manager.placements)
-            # Distribute rewards based on placement
-            for place, player_id in enumerate(self.game_manager.placements):
-                place_to_reward = [10,6,4,2,-2,-4,-6,-8]
-                reward[player_id] = place_to_reward[place]
-
-            print("REWARDS:", reward)
-            done = True
-
+        self.done = done
         return self.observation, reward, done, {}
 
     def reset(self):
@@ -188,7 +186,7 @@ class TeamfightTacticsEnv(gym.Env):
         legal_actions = np.zeros(self.action_space.n)
 
         for i in range(self.action_space.n):
-            legal_actions[i] = is_action_legal(self.current_player, i)
+            legal_actions[i] = (1 if is_action_legal(self.current_player, i) else 0)
 
         return legal_actions
 

@@ -12,5 +12,5 @@ for i in range(40):
 	gm.simulate_combat_step()
 	gm.distribute_income()
 	gm.roll_all_players_shops()
-
+	gm.print_board_state()
 
