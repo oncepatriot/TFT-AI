@@ -38,8 +38,6 @@ class TftFightPredictor():
 		"""
 		p1board = self.encode_player_state_for_prediction(player_one)
 		p2board = self.encode_player_state_for_prediction(player_two)
-		print("predicing match between these boards:")
-		print(p1board, p2board)
 		predict_this = self.encoder.transform([p1board + p2board])
 		prediction = self.model.predict_proba(predict_this)
 
@@ -76,6 +74,7 @@ class TftFightPredictor():
 			]
 		"""
 		encoded = []
+		sorted(player.board, key=lambda c: 0 if c != None else 1)
 		for champ in player.board:
 			if champ == None:
 				encoded += ["None",0,0,0,0]

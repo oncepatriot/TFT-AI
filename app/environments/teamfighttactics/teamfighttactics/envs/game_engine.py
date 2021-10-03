@@ -121,7 +121,7 @@ class GameManager():
         else:
             if self.round == 6:
                 self.stage += 1
-                self.round == 1
+                self.round = 1
             else:
                 self.round += 1
 
@@ -176,10 +176,11 @@ class GameManager():
         random.shuffle(alive_players)
         mm_pairs = [alive_players[i:i + 2] for i in range(0, len(alive_players), 2)] # create pairs
 
+        # TODO: If odd number of players, will need to create a ghost...
         for pair in mm_pairs:
             player_one = self.players[pair[0]]
             player_two = self.players[pair[1]]
-
+            print(player_one.id, player_two.id)
 
             p1_win_probability, p2_win_probability = self.fight_predictor.predict_tft_fight(
                 player_one,
@@ -187,25 +188,29 @@ class GameManager():
             )
 
             if p1_win_probability > .5:
-                win = True
-                player_one.update_streak(1)
-                player_one.gold += 1
+                winner_probability = p1_win_probability
+                winner = player_one
+                loser = player_two
             else:
-                player_two.update_streak(-1)
-                player_two.health -= self.stage_damage
+                winner_probability = p2_win_probability
+                winner = player_one
+                loser = player_two
 
-                # Approximate number of units lost by. Examples:
-                # .8 * 4 units on board = 3.2 = 3 unit loss
-                # .5 * 4 units on board = 2 unit loss
-                # .8 * 8 units on board = 6.4 = 6 unit loss
-                # .5 * 8 units on board = 4 = 4 unit loss
-                units_lost_by = math.floor(p1_win_probability * player_one.num_units_on_board) - random.randint(0,1)
-                player_two.health -= self.get_damage_for_x_unit_loss(units_lost_by)
+            winner.update_streak(True)
+            winner.gold += 1
+            loser.update_streak(False)
+            loser.health -= self.stage_damage
 
-            if player_one.is_eliminated:
-                self.placements.prepend(player_one)
-            if player_two.is_eliminated:
-                self.placements.prepend(player_two)
+            # Approximate number of units lost by. Examples:
+            # .8 * 4 units on board = 3.2 = 3 unit loss
+            # .5 * 4 units on board = 2 unit loss
+            # .8 * 8 units on board = 6.4 = 6 unit loss
+            # .5 * 8 units on board = 4 = 4 unit loss
+            units_lost_by = math.floor(winner_probability * winner.num_units_on_board) - random.randint(0,1)
+            loser.health -= min(1, self.get_damage_for_x_unit_loss(units_lost_by))
+
+            if loser.is_eliminated:
+                self.placements.insert(0,loser)
 
             player_one.ready = False
             player_two.ready = False
@@ -277,7 +282,6 @@ class GameManager():
             player.bench[bench_index] = None
             player.gold += champion.sell_value
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
-            player.sort_units_to_front()
         else:
             raise Exception("tried to sell hero at bench index where none existed", player.id)
 
@@ -287,7 +291,6 @@ class GameManager():
             player.board[board_index] = None
             player.gold += champion.sell_value
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
-            player.sort_units_to_front()
         else:
             raise Exception("tried to sell hero at board index where none existed", player.id)
 
@@ -456,7 +459,7 @@ class GameManager():
 
     @property
     def stage_damage(self):
-        stage_to_damage = [0,0,2,3,5,8,15]
+        stage_to_damage = [0,0,2,3,5,8,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15]
         return stage_to_damage[self.stage-1]
     
     def get_damage_for_x_unit_loss(self, num_units):
@@ -546,14 +549,12 @@ class Player():
         for i, bench_occupant in enumerate(self.bench):
             if bench_occupant == None:
                 self.bench[i] = champion
-                self.sort_units_to_front()
                 return
 
     def add_champion_to_board(self, champion):
         for i, board_occupant in enumerate(self.board):
             if board_occupant == None:
                 self.board[i] = champion
-                self.sort_units_to_front()
                 return
 
     @property
@@ -580,6 +581,8 @@ class Player():
         elif abs(self.streak) > 1:
             income += 1
 
+        # interest with max at 5
+        income += min((self.gold // 10), 5)
         return income
     
     @property
@@ -590,10 +593,6 @@ class Player():
     def num_units_on_board(self):
         return len([i for i in self.board if i])
     
-    def sort_units_to_front(self):
-        sorted(self.board, key=lambda c: 0 if c == None else 1)
-        sorted(self.bench, key=lambda c: 0 if c == None else 1)
-
     def print_player(self):
         print(f"Player: {self.id} | Level: {self.level} | Exp: {self.exp} | Health: {self.health} | Gold: {self.gold} | Streak: {self.streak}")
         print("Board:", [str(c) for c in self.board])
@@ -743,7 +742,7 @@ def is_action_legal(player, action):
         return (player.gold >= 2)
 
     elif action == ACTIONS_MAP["BUY_EXP"]:
-        return (player.gold >= 4)
+        return (player.gold >= 4 and player.level < 9)
 
     elif action == ACTIONS_MAP["READY_NEXT_STAGE"]:
         return (not player.ready)

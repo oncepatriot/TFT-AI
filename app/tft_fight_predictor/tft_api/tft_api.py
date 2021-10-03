@@ -16,17 +16,20 @@ TEMP_API_KEY = "RGAPI-2f66cfaa-e70c-4b6d-afe4-12a8d1a77520"
 def get_match_ids_by_puuid(puuid):
     r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/{puuid}/ids?count=50&api_key={TEMP_API_KEY}")
     match_ids = r.json()
+    print("Response from get matches by puuid", match_ids)
     return match_ids
 
 def get_match_by_match_id(match_id):
     r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/{match_id}?api_key={TEMP_API_KEY}")
+    match = r.json()
+    print("Response from get match by id", match)
     return r.json()
 
 def run_match_data_scraper():
     player_puuids = [TEST_PUUID]
     match_ids_processed = {}
     while True:   
-        time.sleep(2)
+        time.sleep(5)
         print("Getting match ids by puuid:")
         puuid = player_puuids.pop(0)
 
@@ -44,9 +47,41 @@ def run_match_data_scraper():
                 print("Processing Match Data: ", match_id)
                 process_match_data_and_add_to_training_data_set(match_data)
                 match_ids_processed[match_id] = True
-                time.sleep(10)
+                time.sleep(20)
             else:
                 continue
+
+def add_all_labels_data_to_training_set():
+    champions = json.load(open('tft_static_data/set5patch1115/champions.json'))
+
+    with open(os.path.dirname(__file__) + '/../data/preprocessed_training_data.csv', mode='a') as csv_file:
+        writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for champion in champions:
+            cid = champion['championId']
+            print(cid)
+            writer.writerow([0,
+                cid,0,0,0,3,
+                cid,0,0,0,3,
+                cid,0,0,0,3,
+                cid,0,0,0,3,
+                cid,0,0,0,3,
+                cid,0,0,0,3,
+                cid,0,0,0,3,
+                cid,0,0,0,3,
+                cid,0,0,0,3,
+                cid,0,0,0,1,
+                cid,0,0,0,1,
+                cid,0,0,0,1,
+                cid,0,0,0,1,
+                cid,0,0,0,1,
+                cid,0,0,0,1,
+                cid,0,0,0,1,
+                cid,0,0,0,1,
+                cid,0,0,0,1,
+            ])
+
+    csv_file.close()
+
 
 def process_match_data_and_add_to_training_data_set(match_data):
     """
