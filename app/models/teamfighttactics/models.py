@@ -75,9 +75,6 @@ def resnet_extractor(y, **kwargs):
     return y
 
 
-
-
-
 def residual(y, filters):
     shortcut = y
 
