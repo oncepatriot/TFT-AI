@@ -91,23 +91,23 @@ class GameManager():
         # TIER 1: 29 of each champ
         for champ in game_utils.get_cost_x_champions(1):
             for i in range(29):
-                champion_pool[1].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits'], champ['id']))
+                champion_pool[1].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
 
         for champ in game_utils.get_cost_x_champions(2):
             for i in range(22):
-                champion_pool[2].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits'], champ['id']))
+                champion_pool[2].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
         
         for champ in game_utils.get_cost_x_champions(3):
             for i in range(18):
-                champion_pool[3].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits'], champ['id']))
+                champion_pool[3].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
                 
         for champ in game_utils.get_cost_x_champions(4):
             for i in range(12):
-                champion_pool[4].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits'], champ['id']))
+                champion_pool[4].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
         
         for champ in game_utils.get_cost_x_champions(5):
             for i in range(10):
-                champion_pool[5].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits'], champ['id']))
+                champion_pool[5].append(Champion(champ['championId'], champ['name'], 1, champ['cost'], champ['traits']))
 
         return champion_pool
 
@@ -176,11 +176,8 @@ class GameManager():
         alive_players = [player for player in self.players if not player.is_eliminated]
         random.shuffle(alive_players)
         if (len(alive_players) % 2) != 0:
-            print("need to add ghost player")
-            print(alive_players)
             ghost_player = deepcopy(alive_players[-1])
             alive_players.append(ghost_player)
-            print(alive_players)
 
         mm_pairs = [alive_players[i:i + 2] for i in range(0, len(alive_players), 2)] # create pairs
 
@@ -246,7 +243,7 @@ class GameManager():
 
     def remove_champion_from_pool(self, champion):
         for i, champ in enumerate(self.champion_pool[champion.cost]):
-            if champ.id == champion.id:
+            if champ.champion_id == champion.champion_id:
                 del self.champion_pool[champion.cost][i]
                 return
 
@@ -276,7 +273,7 @@ class GameManager():
             for b in board_locations:
                 player.board[b] = None
 
-            upgraded_champ = Champion(champion.champion_id, champion.name, champion.level + 1, champion.cost, champion.traits, champion.id)
+            upgraded_champ = Champion(champion.champion_id, champion.name, champion.level + 1, champion.cost, champion.traits)
             player.add_champion_to_bench(upgraded_champ)
             self.maybe_upgrade_champions_for_player(player, champion) # Check again for double upgrade
 
@@ -494,7 +491,7 @@ class Player():
         self.bench = [None]*9
         self.health = 100
         self.ready = False
-        self.items = [0]*9
+        self.items = [None]*9
         self.streak = 0 # negative is lose streak, positive is win streak
 
         # Metric count actions since last ready, maybe use this 
@@ -613,20 +610,19 @@ class Player():
 
 
 class Champion():
-    def __init__(self, champion_id, name, level, cost, traits, id):
+    def __init__(self, champion_id, name, level, cost, traits):
         self.champion_id = champion_id
         self.level = level
         self.name = name
         self.cost = cost
         self.traits = traits
-        self.items = [0] * 3 # array of item_ids (1532)
-        self.id = id
+        self.items = [None] * 3 # array of item_ids (1532)
 
     def __str__(self):
         return f"Level {self.level} {self.champion_id}"
 
     def is_same_level_and_champ(self, champ):
-        return self.level == champ.level and self.id == champ.id
+        return self.level == champ.level and self.champion_id == champ.champion_id
 
     @property
     def sell_value(self):
@@ -639,13 +635,13 @@ class Champion():
     def champions_to_return_to_pool_when_sold(self):
         champions = []
         if self.level == 1:
-            champions.append(Champion(self.champion_id, self.name, 1, self.cost, self.traits, self.id))
+            champions.append(Champion(self.champion_id, self.name, 1, self.cost, self.traits))
         elif self.level == 2:
             for i in range(3):
-                champions.append(Champion(self.champion_id, self.name, 1, self.cost, self.traits, self.id))
+                champions.append(Champion(self.champion_id, self.name, 1, self.cost, self.traits))
         elif self.level == 3:
             for i in range(9):
-                champions.append(Champion(self.champion_id, self.name, 1, self.cost, self.traits, self.id))
+                champions.append(Champion(self.champion_id, self.name, 1, self.cost, self.traits))
 
         return champions
 

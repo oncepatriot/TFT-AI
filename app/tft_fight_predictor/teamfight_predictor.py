@@ -79,6 +79,12 @@ class TftFightPredictor():
 			if champ == None:
 				encoded += ["None",0,0,0,0]
 			else:
-				encoded += [champ.champion_id,champ.items[0],champ.items[1],champ.items[2],champ.level]
+				encoded += [
+				champ.champion_id, 
+				champ.items[0] if champ.items[0] else 0,
+				champ.items[1] if champ.items[1] else 0,
+				champ.items[2] if champ.items[2] else 0,
+				champ.level
+			]
 
 		return encoded

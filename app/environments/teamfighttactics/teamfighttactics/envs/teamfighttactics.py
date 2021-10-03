@@ -3,7 +3,7 @@ import numpy as np
 import config
 from stable_baselines import logger
 from .game_engine import *
-
+from .game_utils import get_champion_id_and_item_name_to_unique_id_map
 
 class TeamfightTacticsEnv(gym.Env):
     metadata = {'render.modes': ['human']}
@@ -17,10 +17,20 @@ class TeamfightTacticsEnv(gym.Env):
         # Vector of all actions available to an agent
         self.action_space = gym.spaces.Discrete(len(ACTIONS_MAP.keys())) # 44 for now...
 
-        # For now, agent only sees all of their tft "board" state such as
-        # gold, champion bench, shop, champions. More advanced implementation
-        # would allow each agent to see all player's board states.
-        self.observation_space = gym.spaces.Box(0, 1, (27,))
+        # Observation space:
+        # 
+        # 
+        # 5 spots for gold, health, exp, levels, streak
+        #
+        # 5 spots for shop (champ_id)
+        # 9 * 4 spots for bench (champ, item, item, item)
+        # 9 * 4 spots for boards (champ, item, item, item) 
+        self.observation_space = gym.spaces.Box(
+            np.array([0, -100, 0, 0, -30] + [0]*77),   # 8s elements
+            np.array([300, 100, 100, 9, 50] +  [1]*77) # 82 elements
+        )
+
+        self.champion_or_item_to_normalized_id = get_champion_id_and_item_name_to_unique_id_map()
 
         # self.players is defined in base class
         self.current_player_num = 0
@@ -30,6 +40,8 @@ class TeamfightTacticsEnv(gym.Env):
         self.game_manager = None
         self.champion_pool = []
 
+        self.iteration = 0
+
     @property
     def observation(self):
         """The `observation` function returns a numpy array 
@@ -38,18 +50,32 @@ class TeamfightTacticsEnv(gym.Env):
         from the perspective of the current player, where each element
         of the array is in the range `[-1,1]`.
         """
-        obs = [
-            self.current_player.health, 
-            self.current_player.gold,
-            self.current_player.level,
-            self.current_player.exp
-        ]
-        obs += [c.id if c else 0 for c in self.current_player.shop]
-        obs += [c.id if c else 0 for c in self.current_player.bench]
-        obs += [c.id if c else 0 for c in self.current_player.board]
-        print(len(obs))
-        # return obs
-        return np.zeros(27)
+        player = self.current_player
+        player_data = [[player.gold, player.health, player.exp, player.level, player.streak]]
+        shop_data = [[c.champion_id if c else None for c in player.shop]]
+        shop_data = [[self.champion_or_item_to_normalized_id[c] for c in s] for s in shop_data]
+
+        bench_data = []
+        for c in player.bench:
+            if c == None:
+                bench_data.append([None, None, None, None])
+            else:
+                bench_data.append([c.champion_id, c.items[0], c.items[1], c.items[2]])
+        bench_data = [[self.champion_or_item_to_normalized_id[c] for c in b] for b in bench_data]
+
+        board_data = []
+        for c in player.board:
+            if c == None:
+                board_data.append([None, None, None, None])
+            else:
+                board_data.append([c.champion_id, c.items[0], c.items[1], c.items[2]])
+        board_data = [[self.champion_or_item_to_normalized_id[c] for c in b] for b in board_data]
+
+        obs = player_data + shop_data + bench_data + board_data
+        # print(obs)
+        result = np.concatenate(obs).flatten()
+        # print(result)
+        return result
 
     def step(self, action):
         """The `step` method accepts an `action` from the current active player and performs the
@@ -63,6 +89,11 @@ class TeamfightTacticsEnv(gym.Env):
         done = False
 
         reward = [0.0] * self.n_players
+
+        self.iteration += 1
+        if self.iteration > 100:
+            self.game_manager.print_board_state()
+
 
         # VALIDATE ACTIONS... Money to buy, If ready cant perform any actions.
         # punish taking actions that are invalid
@@ -99,6 +130,7 @@ class TeamfightTacticsEnv(gym.Env):
 
 
         if self.game_manager.check_game_over():
+            self.iteration = 0
             print("==========")
             print("GAME OVER")
             print("FINAL BOARD STATE:")

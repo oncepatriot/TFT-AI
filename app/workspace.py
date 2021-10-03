@@ -7,9 +7,10 @@ for i in range(8):
 
 gm = game_engine.GameManager(players)
 
-for i in range(100):
-	gm.print_board_state()
+for i in range(40):
 	gm.increment_stage_round()
 	gm.simulate_combat_step()
 	gm.distribute_income()
 	gm.roll_all_players_shops()
+
+
