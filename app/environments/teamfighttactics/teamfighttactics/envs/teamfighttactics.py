@@ -26,7 +26,7 @@ class TeamfightTacticsEnv(gym.Env):
         # 9 * 4 spots for bench (champ, item, item, item)
         # 9 * 4 spots for boards (champ, item, item, item) 
         self.observation_space = gym.spaces.Box(
-            np.array([0, -100, 0, 0, -30] + [0]*77),   # 8s elements
+            np.array([0, -100, 0, 0, -30] + [0]*77),   # 82 elements
             np.array([300, 100, 100, 9, 50] +  [1]*77) # 82 elements
         )
 
@@ -74,7 +74,9 @@ class TeamfightTacticsEnv(gym.Env):
         # print(obs)
         result = np.concatenate(obs).flatten()
         # print(result)
+
         return result
+        # return np.zeros(82)
 
     def step(self, action):
         """The `step` method accepts an `action` from the current active player and performs the
@@ -85,64 +87,79 @@ class TeamfightTacticsEnv(gym.Env):
         Arguments:
             action - int - Action integer that maps to an action in the action space
         """
-        print(self.current_player_num, action)
         done = False
         reward = [0.0] * self.n_players
         
+        # TODO: BUG: PLAYER CHOOSING aCTION 8 INFINITELY
+        # print(action)
 
         # VALIDATE ACTIONS... Money to buy, If ready cant perform any actions.
         # punish taking actions that are invalid
         if self.legal_actions[action] == 0:
-            reward = [1.0/(self.n_players-1)] * self.n_players
-            reward[self.current_player_num] = -1
+            # mayb penalize illegal actions
+            pass
         else:
             try:
-                if not self.current_player.is_eliminated:
-                    self.game_manager.execute_agent_action(self.current_player, action)
+                print("excecuting:", self.current_player.id, action)
+                self.game_manager.execute_agent_action(self.current_player, action)
             except Exception as e:
                 print("ERROR EXECUTING ACTION", e)
-                print(self.game_manager.print_board_state())
+                self.game_manager.print_board_state()
                 raise Exception("Error executing game action")
 
-            # IF ALL PLAYERS ARE READY:
-            # Calculate "combat math" based on all players current boards.
-            # Matchmake players against one another, subtract healths
-            # Eliminate dead players
-            # End game if last player standing
-            if self.game_manager.is_all_players_ready:
-                print("all players ready")
-                self.game_manager.increment_stage_round()
-                self.game_manager.simulate_combat_step()
-                self.game_manager.distribute_income()
-                self.game_manager.roll_all_players_shops()
-                self.game_manager.print_board_state()
+        # If not a ready action
+        if action != 43:
+            self.current_player.actions_since_last_ready += 1
+        # Force player to ready if they took 13 non ready actions
+        if self.current_player.actions_since_last_ready > 13:
+            self.current_player.ready = True
+            self.current_player.actions_since_last_ready = 0
 
+        # IF ALL PLAYERS ARE READY:
+        # Calculate "combat math" based on all players current boards.
+        # Matchmake players against one another, subtract healths
+        # Eliminate dead players
+        # End game if last player standing
+        if self.game_manager.is_all_players_ready:
+            print("all players ready for ", self.game_manager.stage, self.game_manager.round)
+            self.game_manager.simulate_combat_step()
 
-                # Distribute reward if a player has 4+ win streak
-                for i, player in enumerate(self.players):
-                    if player.streak >= 4:
-                        reward[i] += .15
-
+            [print(p.health) for p in self.players]
 
             if self.game_manager.check_game_over():
                 print("==========")
                 print("GAME OVER")
                 print("FINAL BOARD STATE:")
-                print(self.game_manager.print_board_state())
+                self.game_manager.print_board_state()
                 print("==========")
                 print("FINAL PLACEMENTS:")
-                print(self.game_manager.placements)
-                # Distribute rewards based on placement
-                for place, player_id in enumerate(self.game_manager.placements):
-                    place_to_reward = [10,6,4,2,-2,-4,-6,-8]
-                    reward[player_id] = place_to_reward[place]
-
-                print("REWARDS:", reward)
+                print([player.id for player in self.game_manager.placements])
                 done = True
+
+                # Distribute rewards based on placement
+                for place, player in enumerate(self.game_manager.placements):
+                    print(place, player.id)
+                    place_to_reward = [10,6,4,2,-2,-4,-6,-8]
+                    reward[player.id] = place_to_reward[place]
+                print("REWARDS:", reward)
+
+            else:
+                # Distribute reward if a player has 4+ win streak
+                for i, player in enumerate(self.players):
+                    # if player.streak >= 4:
+                    #     reward[i] += .15
+                    if player.is_eliminated:
+                        reward[i] -= .1
+
+                self.game_manager.distribute_income()
+                self.game_manager.roll_all_players_shops()
+                self.game_manager.increment_stage_round()
+
+            # self.game_manager.print_board_state()
+
 
         # Update current player to the next player
         self.current_player_num = (self.current_player_num + 1) % self.n_players
-
         self.done = done
         return self.observation, reward, done, {}
 

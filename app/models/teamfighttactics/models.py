@@ -10,7 +10,7 @@ from stable_baselines.common.distributions import CategoricalProbabilityDistribu
 
 
 ACTIONS = 44
-FEATURE_SIZE = 77
+FEATURE_SIZE = 82
 
 class CustomPolicy(ActorCriticPolicy):
     def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, **kwargs):
@@ -56,8 +56,6 @@ def value_head(y):
 
 
 def policy_head(y, legal_actions):
-
-
     y = dense(y, FEATURE_SIZE)
     policy = dense(y, ACTIONS, batch_norm = False, activation = None, name='pi')
     

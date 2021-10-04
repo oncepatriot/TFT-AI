@@ -290,6 +290,9 @@ There are many repositories and blogs that have helped me to put together this r
 [linkedin-url]: https://linkedin.com/in/davidtfoster
 
 
+docker-compose up -d
+bash ./scripts/install_env.sh teamfighttactics
+
 SSH into container
 
 docker exec -it selfplay bash

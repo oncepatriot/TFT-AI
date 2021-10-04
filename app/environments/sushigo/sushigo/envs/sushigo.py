@@ -264,10 +264,7 @@ class SushiGoEnv(gym.Env):
 
         # check move legality
         if self.legal_actions[action] == 0:
-            reward = [1.0/(self.n_players-1)] * self.n_players
-            reward[self.current_player_num] = -1
-            done = True
-
+            pass
         #play the card(s)
         else:
             self.action_bank.append(action)

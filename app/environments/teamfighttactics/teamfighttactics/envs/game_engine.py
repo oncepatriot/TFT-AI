@@ -177,6 +177,7 @@ class GameManager():
         random.shuffle(alive_players)
         if (len(alive_players) % 2) != 0:
             ghost_player = deepcopy(alive_players[-1])
+            ghost_player.is_ghost = True
             alive_players.append(ghost_player)
 
         mm_pairs = [alive_players[i:i + 2] for i in range(0, len(alive_players), 2)] # create pairs
@@ -190,6 +191,7 @@ class GameManager():
                 player_one,
                 player_two
             )
+            print("FIGHTING:" , player_one.board, player_two.board)
 
             if p1_win_probability > .5:
                 winner_probability = p1_win_probability
@@ -213,7 +215,7 @@ class GameManager():
             units_lost_by = math.floor(winner_probability * winner.num_units_on_board) - random.randint(0,1)
             loser.health -= min(1, self.get_damage_for_x_unit_loss(units_lost_by))
 
-            if loser.is_eliminated:
+            if loser.is_eliminated and not loser.is_ghost:
                 self.placements.insert(0,loser)
 
             player_one.ready = False
@@ -222,8 +224,8 @@ class GameManager():
     def purchase_champion_at_shop_index(self, player, shop_index):
         # TODO: Player can buy champ if bench is full but buying will
         # upgrade the champion
-        if player.bench_is_full:
-            raise Exception("Tried to buy champ with full bench")
+        if player.bench_is_full and player.board_is_full:
+            raise Exception("Tried to buy champ with full bench and board")
 
         players_shop = player.shop
         champion = players_shop[shop_index]
@@ -233,7 +235,12 @@ class GameManager():
             # deduct gold, add to players bench, and remove from champion pool
             player.gold = player.gold - champion.cost
             player.shop[shop_index] = None
-            player.add_champion_to_bench(champion)
+
+            if not player.board_is_full:
+                player.add_champion_to_board(champion)
+            elif not player.board_is_full:
+                player.add_champion_to_bench(champion)
+
             self.remove_champion_from_pool(champion)
             self.maybe_upgrade_champions_for_player(player, champion)
         else:
@@ -483,7 +490,7 @@ class GameManager():
 class Player():
     def __init__(self, id):
         self.id = id
-        self.gold = 0
+        self.gold = 3
         self.level = 1
         self.exp = 0
         self.shop = [None]*5
@@ -492,6 +499,7 @@ class Player():
         self.health = 100
         self.ready = False
         self.items = [None]*9
+        self.is_ghost = False
         self.streak = 0 # negative is lose streak, positive is win streak
 
         # Metric count actions since last ready, maybe use this 
@@ -651,15 +659,15 @@ def is_action_legal(player, action):
     # Player puchasing champ must have a bench slot and enough gold. TODO:
     # technically they can buy if bench is full and buying champ levels champ up
     if action == ACTIONS_MAP["BUY_SHOP_POS_1"]:
-        return (not player.bench_is_full and player.shop[0] != None and player.shop[0].cost <= player.gold)
+        return ((not player.bench_is_full or player.board_is_full) and player.shop[0] != None and player.shop[0].cost <= player.gold)
     elif action == ACTIONS_MAP["BUY_SHOP_POS_2"]:
-        return (not player.bench_is_full and player.shop[1] != None and player.shop[1].cost <= player.gold)
+        return ((not player.bench_is_full or player.board_is_full) and player.shop[1] != None and player.shop[1].cost <= player.gold)
     elif action == ACTIONS_MAP["BUY_SHOP_POS_3"]:
-        return (not player.bench_is_full and player.shop[2] != None and player.shop[2].cost <= player.gold)
+        return ((not player.bench_is_full or player.board_is_full) and player.shop[2] != None and player.shop[2].cost <= player.gold)
     elif action == ACTIONS_MAP["BUY_SHOP_POS_4"]:
-        return (not player.bench_is_full and player.shop[3] != None and player.shop[3].cost <= player.gold)
+        return ((not player.bench_is_full or player.board_is_full) and player.shop[3] != None and player.shop[3].cost <= player.gold)
     elif action == ACTIONS_MAP["BUY_SHOP_POS_5"]:
-        return (not player.bench_is_full and player.shop[4] != None and player.shop[4].cost <= player.gold)
+        return ((not player.bench_is_full or player.board_is_full) and player.shop[4] != None and player.shop[4].cost <= player.gold)
 
     # Player can sell bench at position if it is not empty
     elif action == ACTIONS_MAP["SELL_BENCH_POS_1"]:
@@ -750,6 +758,6 @@ def is_action_legal(player, action):
         return (player.gold >= 4 and player.level < 9)
 
     elif action == ACTIONS_MAP["READY_NEXT_STAGE"]:
-        return True
+        return (not player.ready)
     else:
         raise Exception("UNRECOGNIZED ACTION", action)
