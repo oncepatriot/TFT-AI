@@ -20,8 +20,6 @@ def mask_actions(legal_actions, action_probs):
 
 
 
-
-
 class Agent():
   def __init__(self, name, model = None):
       self.name = name
@@ -39,7 +37,9 @@ class Agent():
         action_probs = np.array(env.rules_move())
         value = None
       else:
+        print(env.observation)
         action_probs = self.model.action_probability(env.observation)
+        print(self.model.policy_pi.value(np.array([env.observation])))
         value = self.model.policy_pi.value(np.array([env.observation]))[0]
         logger.debug(f'Value {value:.2f}')
 

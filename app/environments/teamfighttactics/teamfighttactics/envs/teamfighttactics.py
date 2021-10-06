@@ -15,16 +15,9 @@ class TeamfightTacticsEnv(gym.Env):
         self.n_players = 8
 
         # Vector of all actions available to an agent
-        self.action_space = gym.spaces.Discrete(len(ACTIONS_MAP.keys())) # 44 for now...
+        self.action_space = gym.spaces.Discrete(len(ACTIONS_MAP.keys()))
 
-        # Observation space:
-        # 
-        # 
-        # 5 spots for gold, health, exp, levels, streak
-        #
-        # 5 spots for shop (champ_id)
-        # 9 * 4 spots for bench (champ, item, item, item)
-        # 9 * 4 spots for boards (champ, item, item, item) 
+        # Observation space - One hot encoded player state
         self.observation_space = gym.spaces.Box(low=-1, high=1, shape=(7081,), dtype=np.float32) 
 
         # self.players is defined in base class
@@ -63,17 +56,12 @@ class TeamfightTacticsEnv(gym.Env):
         done = False
         reward = [0.0] * self.n_players
         
-        # TODO: BUG: PLAYER CHOOSING aCTION 8 INFINITELY
-        # print(action)
-
-        # VALIDATE ACTIONS... Money to buy, If ready cant perform any actions.
-        # punish taking actions that are invalid
         if self.legal_actions[action] == 0:
-            print("penalizing", action)
+            # Maybe penalize illegal actions?: 
             reward = [1.0/(self.n_players-1)] * self.n_players
             reward[self.current_player_num] = -1
             done = True
-            # pass
+            pass
         else:
             try:
                 print("excecuting:", self.current_player.id, action)
@@ -97,7 +85,6 @@ class TeamfightTacticsEnv(gym.Env):
         # Eliminate dead players
         # End game if last player standing
         if self.game_manager.is_all_players_ready:
-            print("all players ready for ", self.game_manager.stage, self.game_manager.round)
             self.game_manager.simulate_combat_step()
 
         
@@ -114,8 +101,9 @@ class TeamfightTacticsEnv(gym.Env):
                 # Distribute rewards based on placement
                 for place, player in enumerate(self.game_manager.placements):
                     print(place, player.id)
-                    place_to_reward = [10,6,4,2,-2,-4,-6,-8]
+                    place_to_reward = [30,25,15,5,-5,-15,-25,-30]
                     reward[player.id] = place_to_reward[place]
+
                 print("REWARDS:", reward)
 
             else:
