@@ -3,7 +3,7 @@ import numpy as np
 import config
 from stable_baselines import logger
 from .game_engine import *
-from .game_utils import get_champion_id_and_item_name_to_unique_id_map
+from .game_utils import PlayerEncoder
 
 class TeamfightTacticsEnv(gym.Env):
     metadata = {'render.modes': ['human']}
@@ -25,12 +25,7 @@ class TeamfightTacticsEnv(gym.Env):
         # 5 spots for shop (champ_id)
         # 9 * 4 spots for bench (champ, item, item, item)
         # 9 * 4 spots for boards (champ, item, item, item) 
-        self.observation_space = gym.spaces.Box(
-            np.array([0, -100, 0, 0, -30] + [0]*77),   # 82 elements
-            np.array([300, 100, 100, 9, 50] +  [1]*77) # 82 elements
-        )
-
-        self.champion_or_item_to_normalized_id = get_champion_id_and_item_name_to_unique_id_map()
+        self.observation_space = gym.spaces.Box(low=-1, high=1, shape=(7081,), dtype=np.float32) 
 
         # self.players is defined in base class
         self.current_player_num = 0
@@ -39,6 +34,8 @@ class TeamfightTacticsEnv(gym.Env):
         # Game state initialized on reset()
         self.game_manager = None
         self.champion_pool = []
+
+        self.player_encoder = PlayerEncoder()
 
 
     @property
@@ -50,32 +47,8 @@ class TeamfightTacticsEnv(gym.Env):
         of the array is in the range `[-1,1]`.
         """
         player = self.current_player
-        player_data = [[player.gold, player.health, player.exp, player.level, player.streak]]
-        shop_data = [[c.champion_id if c else None for c in player.shop]]
-        shop_data = [[self.champion_or_item_to_normalized_id[c] for c in s] for s in shop_data]
-
-        bench_data = []
-        for c in player.bench:
-            if c == None:
-                bench_data.append([None, None, None, None])
-            else:
-                bench_data.append([c.champion_id, c.items[0], c.items[1], c.items[2]])
-        bench_data = [[self.champion_or_item_to_normalized_id[c] for c in b] for b in bench_data]
-
-        board_data = []
-        for c in player.board:
-            if c == None:
-                board_data.append([None, None, None, None])
-            else:
-                board_data.append([c.champion_id, c.items[0], c.items[1], c.items[2]])
-        board_data = [[self.champion_or_item_to_normalized_id[c] for c in b] for b in board_data]
-
-        obs = player_data + shop_data + bench_data + board_data
-        # print(obs)
-        result = np.concatenate(obs).flatten()
-        # print(result)
-
-        return result
+        obs = self.player_encoder.get_player_observation(player)
+        return obs
         # return np.zeros(82)
 
     def step(self, action):
@@ -96,8 +69,11 @@ class TeamfightTacticsEnv(gym.Env):
         # VALIDATE ACTIONS... Money to buy, If ready cant perform any actions.
         # punish taking actions that are invalid
         if self.legal_actions[action] == 0:
-            # mayb penalize illegal actions
-            pass
+            print("penalizing", action)
+            reward = [1.0/(self.n_players-1)] * self.n_players
+            reward[self.current_player_num] = -1
+            done = True
+            # pass
         else:
             try:
                 print("excecuting:", self.current_player.id, action)
@@ -124,8 +100,7 @@ class TeamfightTacticsEnv(gym.Env):
             print("all players ready for ", self.game_manager.stage, self.game_manager.round)
             self.game_manager.simulate_combat_step()
 
-            [print(p.health) for p in self.players]
-
+        
             if self.game_manager.check_game_over():
                 print("==========")
                 print("GAME OVER")

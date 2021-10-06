@@ -29,7 +29,6 @@ def get_cost_x_champions(cost):
     champs = [c for c in champions_data if c['cost'] == cost]
     return champs
 
-
 def create_and_save_game_state_one_hot_encoder():
     champions_data = get_champion_data()
     items_data = get_items_data()
@@ -41,7 +40,7 @@ def create_and_save_game_state_one_hot_encoder():
 
     categories = []
     # First five categories is the shop, which can hold CHAMPION_IDs
-    categories += [champion_ids] * 5
+    categories += [['None'] + champion_ids] * 5
     for i in range(18):
         categories += [['None'] + champion_ids] # the champion name
         categories += [['0'] + item_ids] * 3 # 3 items champ can hold
@@ -57,12 +56,6 @@ def create_and_save_game_state_one_hot_encoder():
 
     dump(game_state_encoder, './game_state_encoder.joblib') 
     encoder = load('./game_state_encoder.joblib') 
-
-
-def get_game_state_hot_encoder():
-    encoder = load('./game_state_encoder.joblib') 
-    return encoder
-
 
 def _generate_flattened_player_state_for_one_hot_encoding():
     champions_data = get_champion_data()
@@ -105,3 +98,27 @@ def _generate_flattened_player_state_for_one_hot_encoding():
     # a string
     flattened_game_state = np.hstack(shop+board+bench)
     return flattened_game_state
+
+class PlayerEncoder():
+    def __init__(self):
+        self.player_state_encoder = self.get_game_state_hot_encoder()
+
+    def get_game_state_hot_encoder(self):
+        encoder = load('./game_state_encoder.joblib') 
+        return encoder
+
+    # Take a Player instance and return their flattened_state to
+    # be one hot encoded
+    def get_player_state_flattened(self, player):
+        board = [[c.champion_id, c.item[0], c.item[1], c.item[2], c.level] if c else ['None',0,0,0,0] for c in player.board]
+        bench = [[c.champion_id, c.item[0], c.item[1], c.item[2], c.level] if c else ['None',0,0,0,0] for c in player.bench]
+        shop = [c.champion_id if c else 'None' for c in player.shop]
+        flattened_state = np.hstack(shop+board+bench)
+        return flattened_state
+
+    def get_player_observation(self, player):
+        player_flattened = self.get_player_state_flattened(player)
+        player_state = self.player_state_encoder.transform([player_flattened]).toarray()[0]
+        observation = np.array([player.gold/100, player.health/100, player.streak/30, player.level/9, player.exp/100])
+        observation = np.concatenate((observation, player_state))
+        return observation
