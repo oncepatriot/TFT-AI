@@ -37,25 +37,31 @@ class Agent():
         action_probs = np.array(env.rules_move())
         value = None
       else:
-        print(env.observation)
         action_probs = self.model.action_probability(env.observation)
-        print(self.model.policy_pi.value(np.array([env.observation])))
         value = self.model.policy_pi.value(np.array([env.observation]))[0]
         logger.debug(f'Value {value:.2f}')
 
       self.print_top_actions(action_probs)
       
+      mask_invalid_actions = True
       if mask_invalid_actions:
         action_probs = mask_actions(env.legal_actions, action_probs)
         logger.debug('Masked ->')
         self.print_top_actions(action_probs)
-        
+      
       action = np.argmax(action_probs)
+
+
       logger.debug(f'Best action {action}')
 
       if not choose_best_action:
-          action = sample_action(action_probs)
-          logger.debug(f'Sampled action {action} chosen')
+        try:
+            action = sample_action(action_probs)
+            logger.debug(f'Sampled action {action} chosen')
+        except Exception as e:
+            print(action_probs)
+            print(e)
+            raise Exception
 
       return action
 

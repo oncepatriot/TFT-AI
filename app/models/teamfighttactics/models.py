@@ -57,9 +57,11 @@ def policy_head(y, legal_actions):
     y = dense(y, FEATURE_SIZE)
     policy = dense(y, ACTIONS, batch_norm = False, activation = None, name='pi')
     
-    mask = Lambda(lambda x: (1 - x) * -1e8)(legal_actions)   
-    
-    policy = Add()([policy, mask])
+    # This layer is supposed to prevent taking iillegal actions but
+    # breaks the model, causing the model to predict only one
+    # viable action
+    # mask = Lambda(lambda x: (1 - x) * -1e8)(legal_actions)   
+    # policy = Add()([policy, mask])
     return policy
 
 

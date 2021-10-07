@@ -191,7 +191,6 @@ class GameManager():
                 player_one,
                 player_two
             )
-            print("FIGHTING:" , player_one.board, player_two.board)
 
             if p1_win_probability > .5:
                 winner_probability = p1_win_probability
@@ -498,7 +497,7 @@ class Player():
         self.bench = [None]*9
         self.health = 100
         self.ready = False
-        self.items = [None]*9
+        self.items = [0]*9
         self.is_ghost = False
         self.streak = 0 # negative is lose streak, positive is win streak
 
@@ -624,7 +623,7 @@ class Champion():
         self.name = name
         self.cost = cost
         self.traits = traits
-        self.items = [None] * 3 # array of item_ids (1532)
+        self.items = [0] * 3 # array of item_ids (1532)
 
     def __str__(self):
         return f"Level {self.level} {self.champion_id}"

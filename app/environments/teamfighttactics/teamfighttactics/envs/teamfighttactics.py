@@ -42,7 +42,8 @@ class TeamfightTacticsEnv(gym.Env):
         player = self.current_player
         obs = self.player_encoder.get_player_observation(player)
         return obs
-        # return np.zeros(82)
+
+        # return np.zeros(7081)
 
     def step(self, action):
         """The `step` method accepts an `action` from the current active player and performs the
@@ -58,13 +59,9 @@ class TeamfightTacticsEnv(gym.Env):
         
         if self.legal_actions[action] == 0:
             # Maybe penalize illegal actions?: 
-            reward = [1.0/(self.n_players-1)] * self.n_players
-            reward[self.current_player_num] = -1
-            done = True
             pass
         else:
             try:
-                print("excecuting:", self.current_player.id, action)
                 self.game_manager.execute_agent_action(self.current_player, action)
             except Exception as e:
                 print("ERROR EXECUTING ACTION", e)
@@ -75,7 +72,7 @@ class TeamfightTacticsEnv(gym.Env):
         if action != 43:
             self.current_player.actions_since_last_ready += 1
         # Force player to ready if they took 13 non ready actions
-        if self.current_player.actions_since_last_ready > 13:
+        if self.current_player.actions_since_last_ready > 25:
             self.current_player.ready = True
             self.current_player.actions_since_last_ready = 0
 
@@ -85,6 +82,7 @@ class TeamfightTacticsEnv(gym.Env):
         # Eliminate dead players
         # End game if last player standing
         if self.game_manager.is_all_players_ready:
+            self.game_manager.print_board_state()
             self.game_manager.simulate_combat_step()
 
         

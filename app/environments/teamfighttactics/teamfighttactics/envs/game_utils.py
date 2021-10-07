@@ -110,15 +110,21 @@ class PlayerEncoder():
     # Take a Player instance and return their flattened_state to
     # be one hot encoded
     def get_player_state_flattened(self, player):
-        board = [[c.champion_id, c.item[0], c.item[1], c.item[2], c.level] if c else ['None',0,0,0,0] for c in player.board]
-        bench = [[c.champion_id, c.item[0], c.item[1], c.item[2], c.level] if c else ['None',0,0,0,0] for c in player.bench]
+        board = [[c.champion_id, c.items[0], c.items[1], c.items[2], c.level] if c else ['None',0,0,0,0] for c in player.board]
+        bench = [[c.champion_id, c.items[0], c.items[1], c.items[2], c.level] if c else ['None',0,0,0,0] for c in player.bench]
         shop = [c.champion_id if c else 'None' for c in player.shop]
         flattened_state = np.hstack(shop+board+bench)
         return flattened_state
 
     def get_player_observation(self, player):
-        player_flattened = self.get_player_state_flattened(player)
-        player_state = self.player_state_encoder.transform([player_flattened]).toarray()[0]
-        observation = np.array([player.gold/100, player.health/100, player.streak/30, player.level/9, player.exp/100])
-        observation = np.concatenate((observation, player_state))
+        try:
+            player_flattened = self.get_player_state_flattened(player)
+            player_state = self.player_state_encoder.transform([player_flattened]).toarray()[0]
+            observation = np.array([player.gold/100, player.health/100, player.streak/30, player.level/9, player.exp/100])
+            observation = np.concatenate((observation, player_state))
+        except Exception as e:
+            print(player_flattened)
+            print(player_state)
+            print(observation)
+            raise Exception(e)
         return observation
