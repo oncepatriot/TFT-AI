@@ -5,6 +5,7 @@ import random
 import sys
 from joblib import dump, load
 import os.path
+from collections import Counter
 
 def get_champion_data():
     champions_data = json.load(open('tft_static_data/set5patch1115/champions.json'))
@@ -13,6 +14,24 @@ def get_champion_data():
 def get_items_data():
     items_data = json.load(open('tft_static_data/set5patch1115/items.json'))
     return items_data
+
+def get_random_item_component():
+    # Base components have ids from 1 to 9
+    item = random.randint(1, 9)
+    return item
+
+def combine_items(item1, item2):
+    # Take advantage of how riot provides item data.
+    # BF Sword(1) + BF Sword(2) = "12" Deathblade
+    items = get_items_data()
+
+    items_to_combine = [item1, item2].sort()
+    combined_item_id = ""
+    for item in items_to_combine:
+        combined_item_id += str(item)
+
+    return int(combined_item_id)
+
 
 def get_cost_x_champions(cost):
     champions_data = get_champion_data()

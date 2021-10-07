@@ -72,7 +72,7 @@ class TeamfightTacticsEnv(gym.Env):
         if action != 43:
             self.current_player.actions_since_last_ready += 1
         # Force player to ready if they took 13 non ready actions
-        if self.current_player.actions_since_last_ready > 25:
+        if self.current_player.actions_since_last_ready > 40:
             self.current_player.ready = True
             self.current_player.actions_since_last_ready = 0
 
@@ -105,18 +105,10 @@ class TeamfightTacticsEnv(gym.Env):
                 print("REWARDS:", reward)
 
             else:
-                # Distribute reward if a player has 4+ win streak
-                for i, player in enumerate(self.players):
-                    # if player.streak >= 4:
-                    #     reward[i] += .15
-                    if player.is_eliminated:
-                        reward[i] -= .1
-
                 self.game_manager.distribute_income()
                 self.game_manager.roll_all_players_shops()
                 self.game_manager.increment_stage_round()
 
-            # self.game_manager.print_board_state()
 
 
         # Update current player to the next player

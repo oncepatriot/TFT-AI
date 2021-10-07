@@ -301,6 +301,12 @@ docker-compose exec app python3 run_model_trainer.py
 docker-compose exec app python3 test.py -r -e teamfighttactics
 docker-compose exec app python3 train.py -r -e teamfighttactics
 
+# The training process can be parallelised using MPI across multiple cores.
+docker-compose exec app mpirun -np 10 python3 train.py -e teamfighttactics
 
 bash ./scripts/install_env.sh teamfighttactics
 docker-compose exec app python3 train.py -r -e teamfighttactics
+
+
+bash scripts/tensorboard.sh
+Navigate to localhost:6006

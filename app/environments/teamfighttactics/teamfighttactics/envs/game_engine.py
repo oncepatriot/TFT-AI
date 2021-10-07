@@ -126,9 +126,21 @@ class GameManager():
             else:
                 self.round += 1
 
+        self.distribute_stage_items_and_gold()
+
         # Each player receives 2 exp at end of round
         for player in self.players:
             player.add_exp(2)
+
+    def distribute_stage_items_and_gold(self):
+        # todo
+        return
+
+    def combine_items(self, player, i1, i2):
+        # combines items in ineventory at index1 and index2
+        items = self.player.items
+        combined = utils.combine_items(items[i1], items[i2])
+        player[items] += 
 
     def distribute_income(self):
         if self.stage == 1:
@@ -191,7 +203,7 @@ class GameManager():
                 player_one,
                 player_two
             )
-
+            print(p1_win_probability, p2_win_probability)
             if p1_win_probability > .5:
                 winner_probability = p1_win_probability
                 winner = player_one
@@ -211,7 +223,7 @@ class GameManager():
             # .5 * 4 units on board = 2 unit loss
             # .8 * 8 units on board = 6.4 = 6 unit loss
             # .5 * 8 units on board = 4 = 4 unit loss
-            units_lost_by = math.floor(winner_probability * winner.num_units_on_board) - random.randint(0,1)
+            units_lost_by = math.floor(winner_probability * winner.num_units_on_board)
             loser.health -= min(1, self.get_damage_for_x_unit_loss(units_lost_by))
 
             if loser.is_eliminated and not loser.is_ghost:
@@ -469,7 +481,7 @@ class GameManager():
 
     @property
     def stage_damage(self):
-        stage_to_damage = [0,0,2,3,5,8,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15]
+        stage_to_damage = [0,0,2,3,5,8,15,15,25,35,55,75,100]
         return stage_to_damage[self.stage-1]
     
     def get_damage_for_x_unit_loss(self, num_units):
@@ -757,6 +769,6 @@ def is_action_legal(player, action):
         return (player.gold >= 4 and player.level < 9)
 
     elif action == ACTIONS_MAP["READY_NEXT_STAGE"]:
-        return (not player.ready)
+        return True
     else:
         raise Exception("UNRECOGNIZED ACTION", action)

@@ -59,6 +59,7 @@ class Agent():
             action = sample_action(action_probs)
             logger.debug(f'Sampled action {action} chosen')
         except Exception as e:
+            print(env.legal_actions)
             print(action_probs)
             print(e)
             raise Exception
