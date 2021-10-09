@@ -274,7 +274,7 @@ class GameManager():
                 loser = player_two
             else:
                 winner_probability = p2_win_probability
-                winner =player_two
+                winner = player_two
                 loser = player_one
 
             winner.update_streak(True)
@@ -288,7 +288,7 @@ class GameManager():
             # .8 * 8 units on board = 6.4 = 6 unit loss
             # .5 * 8 units on board = 4 = 4 unit loss
             units_lost_by = math.floor(winner_probability * winner.num_units_on_board)
-            loser.health -= min(1, self.get_damage_for_x_unit_loss(units_lost_by))
+            loser.health -= min(2, self.get_damage_for_x_unit_loss(units_lost_by))
 
             if loser.is_eliminated and not loser.is_ghost:
                 self.placements.insert(0,loser)
