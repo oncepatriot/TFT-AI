@@ -23,15 +23,15 @@ def get_random_item_component():
 def combine_items(item1, item2):
     # Take advantage of how riot provides item data.
     # BF Sword(1) + BF Sword(2) = "12" Deathblade
-    items = get_items_data()
+    items = get_items_data() # Todo cache this
 
-    items_to_combine = [item1, item2].sort()
+    items_to_combine = [item1, item2]
+    items_to_combine.sort()
     combined_item_id = ""
     for item in items_to_combine:
         combined_item_id += str(item)
 
     return int(combined_item_id)
-
 
 def get_cost_x_champions(cost):
     champions_data = get_champion_data()
@@ -60,10 +60,13 @@ def create_and_save_game_state_one_hot_encoder():
     categories = []
     # First five categories is the shop, which can hold CHAMPION_IDs
     categories += [['None'] + champion_ids] * 5
+    # Next six slots for item intentory slots
+    categories += [['0'] + item_ids] * 6
+ 
     for i in range(18):
         categories += [['None'] + champion_ids] # the champion name
         categories += [['0'] + item_ids] * 3 # 3 items champ can hold
-        categories.append(["0", "1","2","3"]) # champ levels
+        categories.append(["0", "1", "2","3"]) # champ levels
 
     game_state_encoder = OneHotEncoder(
         categories=categories,
@@ -84,6 +87,12 @@ def _generate_flattened_player_state_for_one_hot_encoding():
     item_ids = [str(i['id']) for i in items_data]
 
     # Mock out what the game state we want to encode will look like
+
+    # SHOP just has the champion names
+    shop = [random.choice(champion_ids) for i in range(5)] 
+
+    # Players inventory
+    inventory = [random.choice(item_ids) for i in range(6)]
 
     # A board will consists of up to 9 champions, each with 3 item slots and their level.
     # A champion is represented by a array of size 4 with [CHAMPION_ID, ITEM1, ITEM2, ITEM3, CHAMPION_LEVEL]
@@ -115,7 +124,8 @@ def _generate_flattened_player_state_for_one_hot_encoding():
     # Now we need to represent this game state as a 1-d vector. 
     # Note that since we work with np arrays, everything is converted to 
     # a string
-    flattened_game_state = np.hstack(shop+board+bench)
+    flattened_game_state = np.hstack(shop+inventory+board+bench)
+    print(len(flattened_game_state))
     return flattened_game_state
 
 class PlayerEncoder():
@@ -129,10 +139,12 @@ class PlayerEncoder():
     # Take a Player instance and return their flattened_state to
     # be one hot encoded
     def get_player_state_flattened(self, player):
+        shop = [c.champion_id if c else 'None' for c in player.shop]
+        inventory = player.items
         board = [[c.champion_id, c.items[0], c.items[1], c.items[2], c.level] if c else ['None',0,0,0,0] for c in player.board]
         bench = [[c.champion_id, c.items[0], c.items[1], c.items[2], c.level] if c else ['None',0,0,0,0] for c in player.bench]
-        shop = [c.champion_id if c else 'None' for c in player.shop]
-        flattened_state = np.hstack(shop+board+bench)
+        
+        flattened_state = np.hstack(shop+inventory+board+bench)
         return flattened_state
 
     def get_player_observation(self, player):

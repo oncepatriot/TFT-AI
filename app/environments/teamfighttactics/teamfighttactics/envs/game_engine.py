@@ -72,10 +72,11 @@ ACTIONS_MAP = {
     "ITEM_1_TO_BOARD_1": 44,
     "ITEM_1_TO_BOARD_2": 45,
     "ITEM_1_TO_BOARD_3": 46,
-    "ITEM_1_TO_BOARD_5": 47,
-    "ITEM_1_TO_BOARD_6": 48,
-    "ITEM_1_TO_BOARD_7": 49, 
-    "ITEM_1_TO_BOARD_8": 50,
+    "ITEM_1_TO_BOARD_4": 47,
+    "ITEM_1_TO_BOARD_5": 48,
+    "ITEM_1_TO_BOARD_6": 49,
+    "ITEM_1_TO_BOARD_7": 50,
+    "ITEM_1_TO_BOARD_8": 51,
     "ITEM_1_TO_BOARD_9": 52,
     "ITEM_2_TO_BOARD_1": 53,
     "ITEM_2_TO_BOARD_2": 54,
@@ -121,7 +122,7 @@ ACTIONS_MAP = {
     "ITEM_6_TO_BOARD_6": 94,
     "ITEM_6_TO_BOARD_7": 95,
     "ITEM_6_TO_BOARD_8": 96,
-    "ITEM_6_TO_BOARD_9": 97
+    "ITEM_6_TO_BOARD_9": 97,
 }
 
 class GameManager():
@@ -190,13 +191,13 @@ class GameManager():
         if self.stage in [1,2,3,4] and self.round in [1,2,3]:
             # Carousel. TODO: Let agent decide their item and champ
             for player in self.players:
-                self.player.items.append(game_utils.get_random_item_component())
+                player.add_item_to_inventory(game_utils.get_random_item_component())
 
         if self.stage in [1,2,3,4] and self.round == 6:
             # Creep round: Drop 2 items
             for player in self.players:
-                self.player.items.append(game_utils.get_random_item_component())
-                self.player.items.append(game_utils.get_random_item_component())
+                player.add_item_to_inventory(game_utils.get_random_item_component())
+                player.add_item_to_inventory(game_utils.get_random_item_component())
 
     def place_item_on_champion(self, player, item_index, board_index):
         item = player.items[item_index]
@@ -527,115 +528,114 @@ class GameManager():
 
         elif action == ACTIONS_MAP["BOARD_9_TO_BENCH"]:
             self.place_champion_from_board_to_bench(player,8)
-
-        elif action == ACTION_MAP["ITEM_1_TO_BOARD_1"]:
-            self.place_item_on_champion(0,0)
-        elif action == ACTION_MAP["ITEM_1_TO_BOARD_2"]:
-            self.place_item_on_champion(0,1)
-        elif action == ACTION_MAP["ITEM_1_TO_BOARD_3"]:
-            self.place_item_on_champion(0,2)
-        elif action == ACTION_MAP["ITEM_1_TO_BOARD_4"]:
-            self.place_item_on_champion(0,3)
-        elif action == ACTION_MAP["ITEM_1_TO_BOARD_5"]:
-            self.place_item_on_champion(0,4)
-        elif action == ACTION_MAP["ITEM_1_TO_BOARD_6"]:
-            self.place_item_on_champion(0,5)
-        elif action == ACTION_MAP["ITEM_1_TO_BOARD_7"]:
-            self.place_item_on_champion(0,6)
-        elif action == ACTION_MAP["ITEM_1_TO_BOARD_8"]:
-            self.place_item_on_champion(0,7)
-        elif action == ACTION_MAP["ITEM_1_TO_BOARD_9"]:
-            self.place_item_on_champion(0,8)
-        elif action == ACTION_MAP["ITEM_2_TO_BOARD_1"]:
-            self.place_item_on_champion(1,0)
-        elif action == ACTION_MAP["ITEM_2_TO_BOARD_2"]:
-            self.place_item_on_champion(1,1)
-        elif action == ACTION_MAP["ITEM_2_TO_BOARD_3"]:
-            self.place_item_on_champion(1,2)
-        elif action == ACTION_MAP["ITEM_2_TO_BOARD_4"]:
-            self.place_item_on_champion(1,3)
-        elif action == ACTION_MAP["ITEM_2_TO_BOARD_5"]:
-            self.place_item_on_champion(1,4)
-        elif action == ACTION_MAP["ITEM_2_TO_BOARD_6"]:
-            self.place_item_on_champion(1,5)
-        elif action == ACTION_MAP["ITEM_2_TO_BOARD_7"]:
-            self.place_item_on_champion(1,6)
-        elif action == ACTION_MAP["ITEM_2_TO_BOARD_8"]:
-            self.place_item_on_champion(1,7)
-        elif action == ACTION_MAP["ITEM_2_TO_BOARD_9"]:
-            self.place_item_on_champion(1,8)
-        elif action == ACTION_MAP["ITEM_3_TO_BOARD_1"]:
-            self.place_item_on_champion(2,0)
-        elif action == ACTION_MAP["ITEM_3_TO_BOARD_2"]:
-            self.place_item_on_champion(2,1)
-        elif action == ACTION_MAP["ITEM_3_TO_BOARD_3"]:
-            self.place_item_on_champion(2,2)
-        elif action == ACTION_MAP["ITEM_3_TO_BOARD_4"]:
-            self.place_item_on_champion(2,3)
-        elif action == ACTION_MAP["ITEM_3_TO_BOARD_5"]:
-            self.place_item_on_champion(2,4)
-        elif action == ACTION_MAP["ITEM_3_TO_BOARD_6"]:
-            self.place_item_on_champion(2,5)
-        elif action == ACTION_MAP["ITEM_3_TO_BOARD_7"]:
-            self.place_item_on_champion(2,6)
-        elif action == ACTION_MAP["ITEM_3_TO_BOARD_8"]:
-            self.place_item_on_champion(2,7)
-        elif action == ACTION_MAP["ITEM_3_TO_BOARD_9"]:
-            self.place_item_on_champion(2,8)
-        elif action == ACTION_MAP["ITEM_4_TO_BOARD_1"]:
-            self.place_item_on_champion(3,0)
-        elif action == ACTION_MAP["ITEM_4_TO_BOARD_2"]:
-            self.place_item_on_champion(3,1)
-        elif action == ACTION_MAP["ITEM_4_TO_BOARD_3"]:
-            self.place_item_on_champion(3,2)
-        elif action == ACTION_MAP["ITEM_4_TO_BOARD_4"]:
-            self.place_item_on_champion(3,3)
-        elif action == ACTION_MAP["ITEM_4_TO_BOARD_5"]:
-            self.place_item_on_champion(3,4)
-        elif action == ACTION_MAP["ITEM_4_TO_BOARD_6"]:
-            self.place_item_on_champion(3,5)
-        elif action == ACTION_MAP["ITEM_4_TO_BOARD_7"]:
-            self.place_item_on_champion(3,6)
-        elif action == ACTION_MAP["ITEM_4_TO_BOARD_8"]:
-            self.place_item_on_champion(3,7)
-        elif action == ACTION_MAP["ITEM_4_TO_BOARD_9"]:
-            self.place_item_on_champion(3,8)
-        elif action == ACTION_MAP["ITEM_5_TO_BOARD_1"]:
-            self.place_item_on_champion(4,0)
-        elif action == ACTION_MAP["ITEM_5_TO_BOARD_2"]:
-            self.place_item_on_champion(4,1)
-        elif action == ACTION_MAP["ITEM_5_TO_BOARD_3"]:
-            self.place_item_on_champion(4,2)
-        elif action == ACTION_MAP["ITEM_5_TO_BOARD_4"]:
-            self.place_item_on_champion(4,3)
-        elif action == ACTION_MAP["ITEM_5_TO_BOARD_5"]:
-            self.place_item_on_champion(4,4)
-        elif action == ACTION_MAP["ITEM_5_TO_BOARD_6"]:
-            self.place_item_on_champion(4,5)
-        elif action == ACTION_MAP["ITEM_5_TO_BOARD_7"]:
-            self.place_item_on_champion(4,6)
-        elif action == ACTION_MAP["ITEM_5_TO_BOARD_8"]:
-            self.place_item_on_champion(4,7)
-        elif action == ACTION_MAP["ITEM_5_TO_BOARD_9"]:
-            self.place_item_on_champion(4,8)
-        elif action == ACTION_MAP["ITEM_6_TO_BOARD_1"]:
-            self.place_item_on_champion(5,0)
-        elif action == ACTION_MAP["ITEM_6_TO_BOARD_2"]:
-            self.place_item_on_champion(5,1)
-        elif action == ACTION_MAP["ITEM_6_TO_BOARD_3"]:
-            self.place_item_on_champion(5,2)
-        elif action == ACTION_MAP["ITEM_6_TO_BOARD_4"]:
-            self.place_item_on_champion(5,3)
-        elif action == ACTION_MAP["ITEM_6_TO_BOARD_5"]:
-            self.place_item_on_champion(5,4)
-        elif action == ACTION_MAP["ITEM_6_TO_BOARD_6"]:
-            self.place_item_on_champion(5,5)
-        elif action == ACTION_MAP["ITEM_6_TO_BOARD_7"]:
-            self.place_item_on_champion(5,6)
-        elif action == ACTION_MAP["ITEM_6_TO_BOARD_8"]:
-            self.place_item_on_champion(5,7)
-        elif action == ACTION_MAP["ITEM_6_TO_BOARD_9"]:
-            self.place_item_on_champion(5,8)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_1"]:
+            self.place_item_on_champion(player,0,0)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_2"]:
+            self.place_item_on_champion(player,0,1)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_3"]:
+            self.place_item_on_champion(player,0,2)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_4"]:
+            self.place_item_on_champion(player,0,3)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_5"]:
+            self.place_item_on_champion(player,0,4)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_6"]:
+            self.place_item_on_champion(player,0,5)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_7"]:
+            self.place_item_on_champion(player,0,6)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_8"]:
+            self.place_item_on_champion(player,0,7)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_9"]:
+            self.place_item_on_champion(player,0,8)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_1"]:
+            self.place_item_on_champion(player,1,0)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_2"]:
+            self.place_item_on_champion(player,1,1)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_3"]:
+            self.place_item_on_champion(player,1,2)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_4"]:
+            self.place_item_on_champion(player,1,3)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_5"]:
+            self.place_item_on_champion(player,1,4)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_6"]:
+            self.place_item_on_champion(player,1,5)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_7"]:
+            self.place_item_on_champion(player,1,6)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_8"]:
+            self.place_item_on_champion(player,1,7)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_9"]:
+            self.place_item_on_champion(player,1,8)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_1"]:
+            self.place_item_on_champion(player,2,0)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_2"]:
+            self.place_item_on_champion(player,2,1)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_3"]:
+            self.place_item_on_champion(player,2,2)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_4"]:
+            self.place_item_on_champion(player,2,3)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_5"]:
+            self.place_item_on_champion(player,2,4)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_6"]:
+            self.place_item_on_champion(player,2,5)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_7"]:
+            self.place_item_on_champion(player,2,6)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_8"]:
+            self.place_item_on_champion(player,2,7)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_9"]:
+            self.place_item_on_champion(player,2,8)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_1"]:
+            self.place_item_on_champion(player,3,0)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_2"]:
+            self.place_item_on_champion(player,3,1)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_3"]:
+            self.place_item_on_champion(player,3,2)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_4"]:
+            self.place_item_on_champion(player,3,3)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_5"]:
+            self.place_item_on_champion(player,3,4)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_6"]:
+            self.place_item_on_champion(player,3,5)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_7"]:
+            self.place_item_on_champion(player,3,6)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_8"]:
+            self.place_item_on_champion(player,3,7)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_9"]:
+            self.place_item_on_champion(player,3,8)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_1"]:
+            self.place_item_on_champion(player,4,0)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_2"]:
+            self.place_item_on_champion(player,4,1)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_3"]:
+            self.place_item_on_champion(player,4,2)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_4"]:
+            self.place_item_on_champion(player,4,3)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_5"]:
+            self.place_item_on_champion(player,4,4)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_6"]:
+            self.place_item_on_champion(player,4,5)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_7"]:
+            self.place_item_on_champion(player,4,6)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_8"]:
+            self.place_item_on_champion(player,4,7)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_9"]:
+            self.place_item_on_champion(player,4,8)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_1"]:
+            self.place_item_on_champion(player,5,0)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_2"]:
+            self.place_item_on_champion(player,5,1)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_3"]:
+            self.place_item_on_champion(player,5,2)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_4"]:
+            self.place_item_on_champion(player,5,3)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_5"]:
+            self.place_item_on_champion(player,5,4)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_6"]:
+            self.place_item_on_champion(player,5,5)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_7"]:
+            self.place_item_on_champion(player,5,6)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_8"]:
+            self.place_item_on_champion(player,5,7)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_9"]:
+            self.place_item_on_champion(player,5,8)
 
         elif action == ACTIONS_MAP["REROLL"]:
             self.roll_players_shop(player)
@@ -688,7 +688,7 @@ class Player():
         self.gold = 3
         self.level = 1
         self.exp = 0
-        self.shop = [None]*6
+        self.shop = [None]*5
         self.board = [None]*9
         self.bench = [None]*9
         self.health = 100
@@ -755,6 +755,14 @@ class Player():
                 self.streak = -1
             else:
                 self.streak -= 1
+
+    def add_item_to_inventory(self, item):
+        if 0 in self.items:
+            self.items[self.items.index(0)] = item
+        else:
+            print("Players inventory is full, throwing away item")
+            return
+
 
     def add_champion_to_bench(self, champion):
         for i, bench_occupant in enumerate(self.bench):
@@ -961,113 +969,113 @@ def is_action_legal(player, action):
         return (not player.bench_is_full and player.board[7] != None)
     elif action == ACTIONS_MAP["BOARD_9_TO_BENCH"]:
         return (not player.bench_is_full and player.board[8] != None)
-    elif action == ACTION_MAP["ITEM_1_TO_BOARD_1"]:
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_1"]:
         return _can_player_place_item_on_board_unit(player, 0, 0)
-    elif action == ACTION_MAP["ITEM_1_TO_BOARD_2"]:
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_2"]:
         return _can_player_place_item_on_board_unit(player, 0, 1)
-    elif action == ACTION_MAP["ITEM_1_TO_BOARD_3"]:
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_3"]:
         return _can_player_place_item_on_board_unit(player, 0, 2)
-    elif action == ACTION_MAP["ITEM_1_TO_BOARD_4"]:
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_4"]:
         return _can_player_place_item_on_board_unit(player, 0, 3)    
-    elif action == ACTION_MAP["ITEM_1_TO_BOARD_5"]:
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_5"]:
         return _can_player_place_item_on_board_unit(player, 0, 4)
-    elif action == ACTION_MAP["ITEM_1_TO_BOARD_6"]:
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_6"]:
         return _can_player_place_item_on_board_unit(player, 0, 5)
-    elif action == ACTION_MAP["ITEM_1_TO_BOARD_7"]:
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_7"]:
         return _can_player_place_item_on_board_unit(player, 0, 6)
-    elif action == ACTION_MAP["ITEM_1_TO_BOARD_8"]:
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_8"]:
         return _can_player_place_item_on_board_unit(player, 0, 7)
-    elif action == ACTION_MAP["ITEM_1_TO_BOARD_9"]:
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_9"]:
         return _can_player_place_item_on_board_unit(player, 0, 8)
-    elif action == ACTION_MAP["ITEM_2_TO_BOARD_1"]:
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_1"]:
         return _can_player_place_item_on_board_unit(player, 1, 0)
-    elif action == ACTION_MAP["ITEM_2_TO_BOARD_2"]:
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_2"]:
         return _can_player_place_item_on_board_unit(player, 1, 1)
-    elif action == ACTION_MAP["ITEM_2_TO_BOARD_3"]:
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_3"]:
         return _can_player_place_item_on_board_unit(player, 1, 2)
-    elif action == ACTION_MAP["ITEM_2_TO_BOARD_4"]:
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_4"]:
         return _can_player_place_item_on_board_unit(player, 1, 3)
-    elif action == ACTION_MAP["ITEM_2_TO_BOARD_5"]:
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_5"]:
         return _can_player_place_item_on_board_unit(player, 1, 4)
-    elif action == ACTION_MAP["ITEM_2_TO_BOARD_6"]:
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_6"]:
         return _can_player_place_item_on_board_unit(player, 1, 5)
-    elif action == ACTION_MAP["ITEM_2_TO_BOARD_7"]:
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_7"]:
         return _can_player_place_item_on_board_unit(player, 1, 6)
-    elif action == ACTION_MAP["ITEM_2_TO_BOARD_8"]:
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_8"]:
         return _can_player_place_item_on_board_unit(player, 1, 7)
-    elif action == ACTION_MAP["ITEM_2_TO_BOARD_9"]:
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_9"]:
         return _can_player_place_item_on_board_unit(player, 1, 8)
-    elif action == ACTION_MAP["ITEM_3_TO_BOARD_1"]:
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_1"]:
         return _can_player_place_item_on_board_unit(player, 2, 0)
-    elif action == ACTION_MAP["ITEM_3_TO_BOARD_2"]:
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_2"]:
         return _can_player_place_item_on_board_unit(player, 2, 1)
-    elif action == ACTION_MAP["ITEM_3_TO_BOARD_3"]:
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_3"]:
         return _can_player_place_item_on_board_unit(player, 2, 2)
-    elif action == ACTION_MAP["ITEM_3_TO_BOARD_4"]:
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_4"]:
         return _can_player_place_item_on_board_unit(player, 2, 3)
-    elif action == ACTION_MAP["ITEM_3_TO_BOARD_5"]:
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_5"]:
         return _can_player_place_item_on_board_unit(player, 2, 4)
-    elif action == ACTION_MAP["ITEM_3_TO_BOARD_6"]:
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_6"]:
         return _can_player_place_item_on_board_unit(player, 2, 5)
-    elif action == ACTION_MAP["ITEM_3_TO_BOARD_7"]:
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_7"]:
         return _can_player_place_item_on_board_unit(player, 2, 6)
-    elif action == ACTION_MAP["ITEM_3_TO_BOARD_8"]:
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_8"]:
         return _can_player_place_item_on_board_unit(player, 2, 7)
-    elif action == ACTION_MAP["ITEM_3_TO_BOARD_9"]:
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_9"]:
         return _can_player_place_item_on_board_unit(player, 2, 8)
-    elif action == ACTION_MAP["ITEM_4_TO_BOARD_1"]:
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_1"]:
         return _can_player_place_item_on_board_unit(player, 3, 0)
-    elif action == ACTION_MAP["ITEM_4_TO_BOARD_2"]:
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_2"]:
         return _can_player_place_item_on_board_unit(player, 3, 1)
-    elif action == ACTION_MAP["ITEM_4_TO_BOARD_3"]:
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_3"]:
         return _can_player_place_item_on_board_unit(player, 3, 2)
-    elif action == ACTION_MAP["ITEM_4_TO_BOARD_4"]:
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_4"]:
         return _can_player_place_item_on_board_unit(player, 3, 3)
-    elif action == ACTION_MAP["ITEM_4_TO_BOARD_5"]:
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_5"]:
         return _can_player_place_item_on_board_unit(player, 3, 4)
-    elif action == ACTION_MAP["ITEM_4_TO_BOARD_6"]:
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_6"]:
         return _can_player_place_item_on_board_unit(player, 3, 5)
-    elif action == ACTION_MAP["ITEM_4_TO_BOARD_7"]:
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_7"]:
         return _can_player_place_item_on_board_unit(player, 3, 6)
-    elif action == ACTION_MAP["ITEM_4_TO_BOARD_8"]:
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_8"]:
         return _can_player_place_item_on_board_unit(player, 3, 7)
-    elif action == ACTION_MAP["ITEM_4_TO_BOARD_9"]:
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_9"]:
         return _can_player_place_item_on_board_unit(player, 3, 8)
-    elif action == ACTION_MAP["ITEM_5_TO_BOARD_1"]:
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_1"]:
         return _can_player_place_item_on_board_unit(player, 4, 0)
-    elif action == ACTION_MAP["ITEM_5_TO_BOARD_2"]:
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_2"]:
         return _can_player_place_item_on_board_unit(player, 4, 1)
-    elif action == ACTION_MAP["ITEM_5_TO_BOARD_3"]:
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_3"]:
         return _can_player_place_item_on_board_unit(player, 4, 2)
-    elif action == ACTION_MAP["ITEM_5_TO_BOARD_4"]:
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_4"]:
         return _can_player_place_item_on_board_unit(player, 4, 3)
-    elif action == ACTION_MAP["ITEM_5_TO_BOARD_5"]:
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_5"]:
         return _can_player_place_item_on_board_unit(player, 4, 4)
-    elif action == ACTION_MAP["ITEM_5_TO_BOARD_6"]:
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_6"]:
         return _can_player_place_item_on_board_unit(player, 4, 5)
-    elif action == ACTION_MAP["ITEM_5_TO_BOARD_7"]:
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_7"]:
         return _can_player_place_item_on_board_unit(player, 4, 6)
-    elif action == ACTION_MAP["ITEM_5_TO_BOARD_8"]:
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_8"]:
         return _can_player_place_item_on_board_unit(player, 4, 7)
-    elif action == ACTION_MAP["ITEM_5_TO_BOARD_9"]:
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_9"]:
         return _can_player_place_item_on_board_unit(player, 4, 8)
-    elif action == ACTION_MAP["ITEM_6_TO_BOARD_1"]:
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_1"]:
         return _can_player_place_item_on_board_unit(player, 5, 0)
-    elif action == ACTION_MAP["ITEM_6_TO_BOARD_2"]:
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_2"]:
         return _can_player_place_item_on_board_unit(player, 5, 1)
-    elif action == ACTION_MAP["ITEM_6_TO_BOARD_3"]:
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_3"]:
         return _can_player_place_item_on_board_unit(player, 5, 2)
-    elif action == ACTION_MAP["ITEM_6_TO_BOARD_4"]:
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_4"]:
         return _can_player_place_item_on_board_unit(player, 5, 3)
-    elif action == ACTION_MAP["ITEM_6_TO_BOARD_5"]:
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_5"]:
         return _can_player_place_item_on_board_unit(player, 5, 4)
-    elif action == ACTION_MAP["ITEM_6_TO_BOARD_6"]:
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_6"]:
         return _can_player_place_item_on_board_unit(player, 5, 5)
-    elif action == ACTION_MAP["ITEM_6_TO_BOARD_7"]:
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_7"]:
         return _can_player_place_item_on_board_unit(player, 5, 6)
-    elif action == ACTION_MAP["ITEM_6_TO_BOARD_8"]:
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_8"]:
         return _can_player_place_item_on_board_unit(player, 5, 7)
-    elif action == ACTION_MAP["ITEM_6_TO_BOARD_9"]:
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_9"]:
         return _can_player_place_item_on_board_unit(player, 5, 8)
 
     elif action == ACTIONS_MAP["REROLL"]:
@@ -1087,7 +1095,7 @@ def _can_player_place_item_on_board_unit(player, item_index, board_index):
 
     if item == 0:
         return False
-    if champ == none:
+    if champ == None:
         return False
 
     for c_i in champ.items:

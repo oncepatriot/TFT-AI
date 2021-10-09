@@ -18,7 +18,7 @@ class TeamfightTacticsEnv(gym.Env):
         self.action_space = gym.spaces.Discrete(len(ACTIONS_MAP.keys()))
 
         # Observation space - One hot encoded player state
-        self.observation_space = gym.spaces.Box(low=-1, high=1, shape=(7081,), dtype=np.float32) 
+        self.observation_space = gym.spaces.Box(low=-1, high=1, shape=(7711,), dtype=np.float32) 
 
         # self.players is defined in base class
         self.current_player_num = 0
@@ -108,8 +108,6 @@ class TeamfightTacticsEnv(gym.Env):
                 self.game_manager.distribute_income()
                 self.game_manager.roll_all_players_shops()
                 self.game_manager.increment_stage_round()
-
-
 
         # Update current player to the next player
         self.current_player_num = (self.current_player_num + 1) % self.n_players
