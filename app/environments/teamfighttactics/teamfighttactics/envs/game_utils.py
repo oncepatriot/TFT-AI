@@ -140,7 +140,7 @@ class PlayerEncoder():
     # be one hot encoded
     def get_player_state_flattened(self, player):
         shop = [c.champion_id if c else 'None' for c in player.shop]
-        inventory = player.items
+        inventory = player.items[:6]
         board = [[c.champion_id, c.items[0], c.items[1], c.items[2], c.level] if c else ['None',0,0,0,0] for c in player.board]
         bench = [[c.champion_id, c.items[0], c.items[1], c.items[2], c.level] if c else ['None',0,0,0,0] for c in player.bench]
         

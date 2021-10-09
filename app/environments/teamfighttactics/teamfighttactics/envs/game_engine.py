@@ -188,7 +188,7 @@ class GameManager():
             player.add_exp(2)
 
     def distribute_stage_items_and_gold(self):
-        if self.stage in [1,2,3,4] and self.round in [1,2,3]:
+        if self.stage in [1,2,3,4] and self.round == 3:
             # Carousel. TODO: Let agent decide their item and champ
             for player in self.players:
                 player.add_item_to_inventory(game_utils.get_random_item_component())
@@ -203,6 +203,8 @@ class GameManager():
         item = player.items[item_index]
         champ = player.board[board_index]
         champ.place_item_on_champion(item)
+        player.items[item_index] = 0
+        player.items.sort(reverse=True)
 
     def distribute_income(self):
         if self.stage == 1:
@@ -265,7 +267,6 @@ class GameManager():
                 player_one,
                 player_two
             )
-            print(p1_win_probability, p2_win_probability)
             if p1_win_probability > .5:
                 winner_probability = p1_win_probability
                 winner = player_one
@@ -367,10 +368,13 @@ class GameManager():
             player.gold += champion.sell_value
 
             for item in champion.champions_items:
-                if 0 in player.items:
-                    player.items[player.items.index(0)] = item
-                else:
-                    raise Exception("No place to add item to bench")
+                if item != 0:
+                    if 0 in player.items:
+                        player.items[player.items.index(0)] = item
+                        player.items.sort(reverse=True)
+                    else:
+                        raise Exception("No place to add item to bench")
+
 
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
         else:
@@ -383,10 +387,12 @@ class GameManager():
             player.gold += champion.sell_value
 
             for item in champion.champions_items:
-                if 0 in player.items:
-                    player.items[player.items.index(0)] = item
-                else:
-                    raise Exception("No place to add item to bench")
+                if item != 0:
+                    if 0 in player.items:
+                        player.items[player.items.index(0)] = item
+                        player.items.sort(reverse=True)
+                    else:
+                        raise Exception("No place to add item to bench")
 
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
         else:
@@ -693,7 +699,7 @@ class Player():
         self.bench = [None]*9
         self.health = 100
         self.ready = False
-        self.items = [0]*6
+        self.items = [0]*14 # only first six items are shown to agents and interacted with
         self.is_ghost = False
         self.streak = 0 # negative is lose streak, positive is win streak
 
@@ -816,7 +822,8 @@ class Player():
         print(f"Player: {self.id} | Level: {self.level} | Exp: {self.exp} | Health: {self.health} | Gold: {self.gold} | Streak: {self.streak}")
         print("Board:", [str(c) for c in self.board])
         print("Bench:", [str(c) for c in self.bench])
-        print("Shop:", [str(c) for c in self.shop] )
+        print("Shop:", [str(c) for c in self.shop])
+        print("Items", [str(i) for i in self.items])
         print(f"Ready: {self.ready}")
 
 
@@ -830,7 +837,7 @@ class Champion():
         self.items = [0] * 3 # array of item_ids (1532)
 
     def __str__(self):
-        return f"Level {self.level} {self.champion_id}"
+        return f"Level {self.level} {self.champion_id} [{self.items}]"
 
     def is_same_level_and_champ(self, champ):
         return self.level == champ.level and self.champion_id == champ.champion_id
@@ -838,9 +845,11 @@ class Champion():
     def place_item_on_champion(self, item):
         for index, citem in enumerate(self.items):
             if citem in [1,2,3,4,5,6,7,8,9]:
-                combined = game_utils.combine_items(citem, item)
-                self.items[index] = combined
-                return
+                if item in [1,2,3,4,5,6,7,8,9]:
+                    combined = game_utils.combine_items(citem, item)
+                    self.items[index] = combined
+                    return
+
             elif citem == 0:
                 self.items[index] = item
                 return
