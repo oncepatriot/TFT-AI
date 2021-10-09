@@ -267,14 +267,15 @@ class GameManager():
                 player_one,
                 player_two
             )
+            print(player_one.id, p1_win_probability, player_two.id, p2_win_probability)
             if p1_win_probability > .5:
                 winner_probability = p1_win_probability
                 winner = player_one
                 loser = player_two
             else:
                 winner_probability = p2_win_probability
-                winner = player_one
-                loser = player_two
+                winner =player_two
+                loser = player_one
 
             winner.update_streak(True)
             winner.gold += 1
@@ -291,6 +292,7 @@ class GameManager():
 
             if loser.is_eliminated and not loser.is_ghost:
                 self.placements.insert(0,loser)
+                # TODO: ADD PLAYER UNITS BACK TO POOL
 
             player_one.ready = False
             player_two.ready = False
@@ -302,7 +304,7 @@ class GameManager():
             raise Exception("Tried to buy champ with full bench and board")
 
         players_shop = player.shop
-        champion = players_shop[shop_index]
+        champion = deepcopy(players_shop[shop_index])
 
         if player.gold >= champion.cost:
             # Puchase the hero: 
@@ -823,7 +825,7 @@ class Player():
         print("Board:", [str(c) for c in self.board])
         print("Bench:", [str(c) for c in self.bench])
         print("Shop:", [str(c) for c in self.shop])
-        print("Items", [str(i) for i in self.items])
+        print("Items", [i for i in self.items])
         print(f"Ready: {self.ready}")
 
 
@@ -837,7 +839,7 @@ class Champion():
         self.items = [0] * 3 # array of item_ids (1532)
 
     def __str__(self):
-        return f"Level {self.level} {self.champion_id} [{self.items}]"
+        return f"Level {self.level} {self.champion_id} {self.items}"
 
     def is_same_level_and_champ(self, champ):
         return self.level == champ.level and self.champion_id == champ.champion_id
