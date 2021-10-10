@@ -267,7 +267,6 @@ class GameManager():
                 player_one,
                 player_two
             )
-            print(player_one.id, p1_win_probability, player_two.id, p2_win_probability)
             if p1_win_probability > .5:
                 winner_probability = p1_win_probability
                 winner = player_one
@@ -296,6 +295,8 @@ class GameManager():
 
             player_one.ready = False
             player_two.ready = False
+            player_one.actions_since_last_ready = 0
+            player_two.actions_since_last_ready = 0
 
     def purchase_champion_at_shop_index(self, player, shop_index):
         # TODO: Player can buy champ if bench is full but buying will
@@ -350,7 +351,6 @@ class GameManager():
                 board_locations.append(index)
 
         if num_champs == 3:
-            print("Upgrading champion for player:", player, champion.champion_id)
             for b in bench_locations:
                 player.bench[b] = None
             for b in board_locations:

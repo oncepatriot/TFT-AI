@@ -71,8 +71,8 @@ class TeamfightTacticsEnv(gym.Env):
         # If not a ready action
         if action != 43:
             self.current_player.actions_since_last_ready += 1
-        # Force player to ready if they took 13 non ready actions
-        if self.current_player.actions_since_last_ready > 40:
+        # Force player to ready if they took 25 non ready actions
+        if self.current_player.actions_since_last_ready > 35:
             self.current_player.ready = True
             self.current_player.actions_since_last_ready = 0
 
@@ -83,9 +83,7 @@ class TeamfightTacticsEnv(gym.Env):
         # End game if last player standing
         if self.game_manager.is_all_players_ready:
             self.game_manager.simulate_combat_step()
-            self.game_manager.print_board_state()
 
-        
             if self.game_manager.check_game_over():
                 print("==========")
                 print("GAME OVER")
@@ -99,7 +97,7 @@ class TeamfightTacticsEnv(gym.Env):
                 # Distribute rewards based on placement
                 for place, player in enumerate(self.game_manager.placements):
                     print(place, player.id)
-                    place_to_reward = [30,25,15,5,-5,-15,-25,-30]
+                    place_to_reward = [15,13,10,2,-6,-10,-13,-15]
                     reward[player.id] = place_to_reward[place]
 
                 print("REWARDS:", reward)
