@@ -83,7 +83,7 @@ class TeamfightTacticsEnv(gym.Env):
         # End game if last player standing
         if self.game_manager.is_all_players_ready:
             self.game_manager.simulate_combat_step()
-            self.game_manager.print_board_state()
+            # self.game_manager.print_board_state()
             if self.game_manager.check_game_over():
                 print("==========")
                 print("GAME OVER")

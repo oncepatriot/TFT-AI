@@ -7,8 +7,9 @@ from stable_baselines.common.callbacks import EvalCallback
 from stable_baselines import logger
 
 from utils.files import get_best_model_name, get_model_stats
-
+from utils.google_cloud_storage import upload_model_to_gcs
 import config
+
 
 class SelfPlayCallback(EvalCallback):
   def __init__(self, opponent_type, threshold, env_name, *args, **kwargs):
@@ -29,9 +30,8 @@ class SelfPlayCallback(EvalCallback):
 
 
   def _on_step(self) -> bool:
-
     if self.eval_freq > 0 and self.n_calls % self.eval_freq == 0:
-
+      print("WE I NTHER")
       result = super(SelfPlayCallback, self)._on_step() #this will set self.best_mean_reward to the reward from the evaluation as it's previously -np.inf
 
       list_of_rewards = MPI.COMM_WORLD.allgather(self.best_mean_reward)
@@ -39,6 +39,13 @@ class SelfPlayCallback(EvalCallback):
       std_reward = np.std(list_of_rewards)
       av_timesteps = np.mean(MPI.COMM_WORLD.allgather(self.num_timesteps))
       total_episodes = np.sum(MPI.COMM_WORLD.allgather(self.n_eval_episodes))
+
+      # Save current model to cloud
+      print("HERE")
+      if True:
+        print("SAVING")
+        upload_model_to_gcs(self.model_dir)
+
 
       if self.callback is not None:
         rules_based_rewards = MPI.COMM_WORLD.allgather(self.callback.best_mean_reward)
