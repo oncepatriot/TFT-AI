@@ -1,6 +1,5 @@
 # ubuntu:bionic-20200219
-
-FROM brunneis/python:3.7.0-ubuntu-18.04 as base
+FROM ubuntu:20.04 as base
 
 RUN apt-get update
 RUN apt-get -y install ssh
