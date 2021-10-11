@@ -29,7 +29,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
 def upload_model_to_gcs(source_file_name):
     bucket_name = 'tft_models'
     today = date.today()
-    blob_name = today.strftime("%m-%d-%y_model")
+    blob_name = today.strftime("%m-%d-%y-%s_model")
     upload_blob(bucket_name, source_file_name, blob_name)
 
 
