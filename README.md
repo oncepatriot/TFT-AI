@@ -311,3 +311,18 @@ docker-compose exec app python3 train.py -e teamfighttactics
 
 bash scripts/tensorboard.sh
 Navigate tolocalhost:6006 
+
+
+
+# HOW TO RUN ON Google Compute engine
+https://cloud.google.com/community/tutorials/docker-compose-on-container-optimized-os
+
+SSH into vm:
+
+git clone https://antoineblueberry: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@github.com/antoineblueberry/TFT-AI.git
+docker run docker/compose:1.24.0 version
+
+Run rest of commands on link above
+
+# tft depedendencies
+docker-compose exec -T app pip3 install -e ./environments/teamfighttactics
