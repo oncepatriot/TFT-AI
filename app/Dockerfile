@@ -1,5 +1,5 @@
 # ubuntu:bionic-20200219
-FROM ubuntu:20.04 as base
+FROM 3.7-buster as base
 
 RUN apt-get update
 RUN apt-get -y install ssh

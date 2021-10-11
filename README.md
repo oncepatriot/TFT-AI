@@ -326,3 +326,4 @@ Run rest of commands on link above
 
 # tft depedendencies
 docker-compose exec -T app pip3 install -e ./environments/teamfighttactics
+docker-compose exec -T app python3 train.py -e teamfighttactics
