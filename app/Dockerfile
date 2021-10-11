@@ -1,5 +1,5 @@
 # ubuntu:bionic-20200219
-FROM 3.7-buster as base
+FROM python:3.7 as base
 
 RUN apt-get update
 RUN apt-get -y install ssh
