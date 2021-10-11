@@ -38,7 +38,12 @@ class TftFightPredictor():
 		"""
 		p1board = self.encode_player_state_for_prediction(player_one)
 		p2board = self.encode_player_state_for_prediction(player_two)
-		predict_this = self.encoder.transform([p1board + p2board])
+		try:
+			predict_this = self.encoder.transform([p1board + p2board])
+		except Exception as e:
+			print(p1board, p2board)
+			raise Exception("Problem encoding players boards for prediction")
+
 		prediction = self.model.predict_proba(predict_this)
 
 		# Returns probabilities player_one wins, player_two_wins. Example: .7, .3
@@ -57,7 +62,7 @@ class TftFightPredictor():
 		        self.bench = [None]*9
 		        self.health = 100
 		        self.ready = False
-		        self.items = []
+		        self.items = [0]*6
 		        self.streak = 0
 
 			to CSV:
@@ -80,11 +85,11 @@ class TftFightPredictor():
 				encoded += ["None",0,0,0,0]
 			else:
 				encoded += [
-				champ.champion_id, 
-				champ.items[0] if champ.items[0] else 0,
-				champ.items[1] if champ.items[1] else 0,
-				champ.items[2] if champ.items[2] else 0,
-				champ.level
-			]
+					champ.champion_id, 
+					int(champ.items[0]) if champ.items[0] else 0,
+					int(champ.items[1]) if champ.items[1] else 0,
+					int(champ.items[2]) if champ.items[2] else 0,
+					champ.level
+				]
 
 		return encoded

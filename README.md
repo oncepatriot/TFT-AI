@@ -289,6 +289,7 @@ There are many repositories and blogs that have helped me to put together this r
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/davidtfoster
 
+cd C:\Users\Samsung\Documents\GitHub\TFT-AI
 
 docker-compose up -d
 bash ./scripts/install_env.sh teamfighttactics
@@ -298,15 +299,15 @@ SSH into container
 docker exec -it selfplay bash
 docker-compose exec app python3 run_data_scraper.py
 docker-compose exec app python3 run_model_trainer.py
-docker-compose exec app python3 test.py -r -e teamfighttactics
-docker-compose exec app python3 train.py -r -e teamfighttactics
+docker-compose exec app python3 test.py -e teamfighttactics
+docker-compose exec app python3 train.py -e teamfighttactics
 
 # The training process can be parallelised using MPI across multiple cores.
 docker-compose exec app mpirun -np 10 python3 train.py -e teamfighttactics
 
 bash ./scripts/install_env.sh teamfighttactics
-docker-compose exec app python3 train.py -r -e teamfighttactics
+docker-compose exec app python3 train.py -e teamfighttactics
 
 
 bash scripts/tensorboard.sh
-Navigate to localhost:6006
+Navigate tolocalhost:6006 

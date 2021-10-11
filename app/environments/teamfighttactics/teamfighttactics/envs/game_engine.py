@@ -68,6 +68,61 @@ ACTIONS_MAP = {
     "REROLL": 41,
     "BUY_EXP": 42,
     "READY_NEXT_STAGE": 43,
+
+    "ITEM_1_TO_BOARD_1": 44,
+    "ITEM_1_TO_BOARD_2": 45,
+    "ITEM_1_TO_BOARD_3": 46,
+    "ITEM_1_TO_BOARD_4": 47,
+    "ITEM_1_TO_BOARD_5": 48,
+    "ITEM_1_TO_BOARD_6": 49,
+    "ITEM_1_TO_BOARD_7": 50,
+    "ITEM_1_TO_BOARD_8": 51,
+    "ITEM_1_TO_BOARD_9": 52,
+    "ITEM_2_TO_BOARD_1": 53,
+    "ITEM_2_TO_BOARD_2": 54,
+    "ITEM_2_TO_BOARD_3": 55,
+    "ITEM_2_TO_BOARD_4": 56,
+    "ITEM_2_TO_BOARD_5": 57,
+    "ITEM_2_TO_BOARD_6": 58,
+    "ITEM_2_TO_BOARD_7": 59,
+    "ITEM_2_TO_BOARD_8": 60,
+    "ITEM_2_TO_BOARD_9": 61,
+    "ITEM_3_TO_BOARD_1": 62,
+    "ITEM_3_TO_BOARD_2": 63,
+    "ITEM_3_TO_BOARD_3": 64,
+    "ITEM_3_TO_BOARD_4": 65,
+    "ITEM_3_TO_BOARD_5": 66,
+    "ITEM_3_TO_BOARD_6": 67,
+    "ITEM_3_TO_BOARD_7": 68,
+    "ITEM_3_TO_BOARD_8": 69,
+    "ITEM_3_TO_BOARD_9": 70,
+    "ITEM_4_TO_BOARD_1": 71,
+    "ITEM_4_TO_BOARD_2": 72,
+    "ITEM_4_TO_BOARD_3": 73,
+    "ITEM_4_TO_BOARD_4": 74,
+    "ITEM_4_TO_BOARD_5": 75,
+    "ITEM_4_TO_BOARD_6": 76,
+    "ITEM_4_TO_BOARD_7": 77,
+    "ITEM_4_TO_BOARD_8": 78,
+    "ITEM_4_TO_BOARD_9": 79,
+    "ITEM_5_TO_BOARD_1": 80,
+    "ITEM_5_TO_BOARD_2": 81,
+    "ITEM_5_TO_BOARD_3": 82,
+    "ITEM_5_TO_BOARD_4": 83,
+    "ITEM_5_TO_BOARD_5": 84,
+    "ITEM_5_TO_BOARD_6": 85,
+    "ITEM_5_TO_BOARD_7": 86,
+    "ITEM_5_TO_BOARD_8": 87,
+    "ITEM_5_TO_BOARD_9": 88,
+    "ITEM_6_TO_BOARD_1": 89,
+    "ITEM_6_TO_BOARD_2": 90,
+    "ITEM_6_TO_BOARD_3": 91,
+    "ITEM_6_TO_BOARD_4": 92,
+    "ITEM_6_TO_BOARD_5": 93,
+    "ITEM_6_TO_BOARD_6": 94,
+    "ITEM_6_TO_BOARD_7": 95,
+    "ITEM_6_TO_BOARD_8": 96,
+    "ITEM_6_TO_BOARD_9": 97,
 }
 
 class GameManager():
@@ -133,14 +188,23 @@ class GameManager():
             player.add_exp(2)
 
     def distribute_stage_items_and_gold(self):
-        # todo
-        return
+        if self.stage in [1,2,3,4] and self.round == 3:
+            # Carousel. TODO: Let agent decide their item and champ
+            for player in self.players:
+                player.add_item_to_inventory(game_utils.get_random_item_component())
 
-    def combine_items(self, player, i1, i2):
-        # combines items in ineventory at index1 and index2
-        items = self.player.items
-        combined = utils.combine_items(items[i1], items[i2])
-        player[items] += 
+        if self.stage in [1,2,3,4] and self.round == 6:
+            # Creep round: Drop 2 items
+            for player in self.players:
+                player.add_item_to_inventory(game_utils.get_random_item_component())
+                player.add_item_to_inventory(game_utils.get_random_item_component())
+
+    def place_item_on_champion(self, player, item_index, board_index):
+        item = player.items[item_index]
+        champ = player.board[board_index]
+        champ.place_item_on_champion(item)
+        player.items[item_index] = 0
+        player.items.sort(reverse=True)
 
     def distribute_income(self):
         if self.stage == 1:
@@ -203,15 +267,14 @@ class GameManager():
                 player_one,
                 player_two
             )
-            print(p1_win_probability, p2_win_probability)
             if p1_win_probability > .5:
                 winner_probability = p1_win_probability
                 winner = player_one
                 loser = player_two
             else:
                 winner_probability = p2_win_probability
-                winner = player_one
-                loser = player_two
+                winner = player_two
+                loser = player_one
 
             winner.update_streak(True)
             winner.gold += 1
@@ -224,13 +287,16 @@ class GameManager():
             # .8 * 8 units on board = 6.4 = 6 unit loss
             # .5 * 8 units on board = 4 = 4 unit loss
             units_lost_by = math.floor(winner_probability * winner.num_units_on_board)
-            loser.health -= min(1, self.get_damage_for_x_unit_loss(units_lost_by))
+            loser.health -= min(2, self.get_damage_for_x_unit_loss(units_lost_by))
 
             if loser.is_eliminated and not loser.is_ghost:
                 self.placements.insert(0,loser)
+                # TODO: ADD PLAYER UNITS BACK TO POOL
 
             player_one.ready = False
             player_two.ready = False
+            player_one.actions_since_last_ready = 0
+            player_two.actions_since_last_ready = 0
 
     def purchase_champion_at_shop_index(self, player, shop_index):
         # TODO: Player can buy champ if bench is full but buying will
@@ -239,7 +305,7 @@ class GameManager():
             raise Exception("Tried to buy champ with full bench and board")
 
         players_shop = player.shop
-        champion = players_shop[shop_index]
+        champion = deepcopy(players_shop[shop_index])
 
         if player.gold >= champion.cost:
             # Puchase the hero: 
@@ -285,7 +351,6 @@ class GameManager():
                 board_locations.append(index)
 
         if num_champs == 3:
-            print("Upgrading champion for player:", player, champion.champion_id)
             for b in bench_locations:
                 player.bench[b] = None
             for b in board_locations:
@@ -303,6 +368,16 @@ class GameManager():
         if champion:
             player.bench[bench_index] = None
             player.gold += champion.sell_value
+
+            for item in champion.champions_items:
+                if item != 0:
+                    if 0 in player.items:
+                        player.items[player.items.index(0)] = item
+                        player.items.sort(reverse=True)
+                    else:
+                        raise Exception("No place to add item to bench")
+
+
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
         else:
             raise Exception("tried to sell hero at bench index where none existed", player.id)
@@ -312,6 +387,15 @@ class GameManager():
         if champion:
             player.board[board_index] = None
             player.gold += champion.sell_value
+
+            for item in champion.champions_items:
+                if item != 0:
+                    if 0 in player.items:
+                        player.items[player.items.index(0)] = item
+                        player.items.sort(reverse=True)
+                    else:
+                        raise Exception("No place to add item to bench")
+
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
         else:
             raise Exception("tried to sell hero at board index where none existed", player.id)
@@ -452,6 +536,114 @@ class GameManager():
 
         elif action == ACTIONS_MAP["BOARD_9_TO_BENCH"]:
             self.place_champion_from_board_to_bench(player,8)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_1"]:
+            self.place_item_on_champion(player,0,0)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_2"]:
+            self.place_item_on_champion(player,0,1)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_3"]:
+            self.place_item_on_champion(player,0,2)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_4"]:
+            self.place_item_on_champion(player,0,3)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_5"]:
+            self.place_item_on_champion(player,0,4)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_6"]:
+            self.place_item_on_champion(player,0,5)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_7"]:
+            self.place_item_on_champion(player,0,6)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_8"]:
+            self.place_item_on_champion(player,0,7)
+        elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_9"]:
+            self.place_item_on_champion(player,0,8)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_1"]:
+            self.place_item_on_champion(player,1,0)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_2"]:
+            self.place_item_on_champion(player,1,1)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_3"]:
+            self.place_item_on_champion(player,1,2)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_4"]:
+            self.place_item_on_champion(player,1,3)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_5"]:
+            self.place_item_on_champion(player,1,4)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_6"]:
+            self.place_item_on_champion(player,1,5)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_7"]:
+            self.place_item_on_champion(player,1,6)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_8"]:
+            self.place_item_on_champion(player,1,7)
+        elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_9"]:
+            self.place_item_on_champion(player,1,8)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_1"]:
+            self.place_item_on_champion(player,2,0)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_2"]:
+            self.place_item_on_champion(player,2,1)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_3"]:
+            self.place_item_on_champion(player,2,2)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_4"]:
+            self.place_item_on_champion(player,2,3)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_5"]:
+            self.place_item_on_champion(player,2,4)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_6"]:
+            self.place_item_on_champion(player,2,5)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_7"]:
+            self.place_item_on_champion(player,2,6)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_8"]:
+            self.place_item_on_champion(player,2,7)
+        elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_9"]:
+            self.place_item_on_champion(player,2,8)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_1"]:
+            self.place_item_on_champion(player,3,0)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_2"]:
+            self.place_item_on_champion(player,3,1)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_3"]:
+            self.place_item_on_champion(player,3,2)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_4"]:
+            self.place_item_on_champion(player,3,3)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_5"]:
+            self.place_item_on_champion(player,3,4)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_6"]:
+            self.place_item_on_champion(player,3,5)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_7"]:
+            self.place_item_on_champion(player,3,6)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_8"]:
+            self.place_item_on_champion(player,3,7)
+        elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_9"]:
+            self.place_item_on_champion(player,3,8)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_1"]:
+            self.place_item_on_champion(player,4,0)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_2"]:
+            self.place_item_on_champion(player,4,1)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_3"]:
+            self.place_item_on_champion(player,4,2)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_4"]:
+            self.place_item_on_champion(player,4,3)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_5"]:
+            self.place_item_on_champion(player,4,4)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_6"]:
+            self.place_item_on_champion(player,4,5)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_7"]:
+            self.place_item_on_champion(player,4,6)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_8"]:
+            self.place_item_on_champion(player,4,7)
+        elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_9"]:
+            self.place_item_on_champion(player,4,8)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_1"]:
+            self.place_item_on_champion(player,5,0)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_2"]:
+            self.place_item_on_champion(player,5,1)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_3"]:
+            self.place_item_on_champion(player,5,2)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_4"]:
+            self.place_item_on_champion(player,5,3)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_5"]:
+            self.place_item_on_champion(player,5,4)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_6"]:
+            self.place_item_on_champion(player,5,5)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_7"]:
+            self.place_item_on_champion(player,5,6)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_8"]:
+            self.place_item_on_champion(player,5,7)
+        elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_9"]:
+            self.place_item_on_champion(player,5,8)
 
         elif action == ACTIONS_MAP["REROLL"]:
             self.roll_players_shop(player)
@@ -509,7 +701,7 @@ class Player():
         self.bench = [None]*9
         self.health = 100
         self.ready = False
-        self.items = [0]*9
+        self.items = [0]*14 # only first six items are shown to agents and interacted with
         self.is_ghost = False
         self.streak = 0 # negative is lose streak, positive is win streak
 
@@ -572,6 +764,14 @@ class Player():
             else:
                 self.streak -= 1
 
+    def add_item_to_inventory(self, item):
+        if 0 in self.items:
+            self.items[self.items.index(0)] = item
+        else:
+            print("Players inventory is full, throwing away item")
+            return
+
+
     def add_champion_to_bench(self, champion):
         for i, bench_occupant in enumerate(self.bench):
             if bench_occupant == None:
@@ -624,7 +824,8 @@ class Player():
         print(f"Player: {self.id} | Level: {self.level} | Exp: {self.exp} | Health: {self.health} | Gold: {self.gold} | Streak: {self.streak}")
         print("Board:", [str(c) for c in self.board])
         print("Bench:", [str(c) for c in self.bench])
-        print("Shop:", [str(c) for c in self.shop] )
+        print("Shop:", [str(c) for c in self.shop])
+        print("Items", [i for i in self.items])
         print(f"Ready: {self.ready}")
 
 
@@ -638,10 +839,28 @@ class Champion():
         self.items = [0] * 3 # array of item_ids (1532)
 
     def __str__(self):
-        return f"Level {self.level} {self.champion_id}"
+        return f"Level {self.level} {self.champion_id} {self.items}"
 
     def is_same_level_and_champ(self, champ):
         return self.level == champ.level and self.champion_id == champ.champion_id
+
+    def place_item_on_champion(self, item):
+        for index, citem in enumerate(self.items):
+            if citem in [1,2,3,4,5,6,7,8,9]:
+                if item in [1,2,3,4,5,6,7,8,9]:
+                    combined = game_utils.combine_items(citem, item)
+                    self.items[index] = combined
+                    return
+
+            elif citem == 0:
+                self.items[index] = item
+                return
+
+        raise Exception("Could not add item to champ")
+
+    @property
+    def champions_items(self):
+        return [i for i in self.items if i != 0]
 
     @property
     def sell_value(self):
@@ -761,6 +980,114 @@ def is_action_legal(player, action):
         return (not player.bench_is_full and player.board[7] != None)
     elif action == ACTIONS_MAP["BOARD_9_TO_BENCH"]:
         return (not player.bench_is_full and player.board[8] != None)
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_1"]:
+        return _can_player_place_item_on_board_unit(player, 0, 0)
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_2"]:
+        return _can_player_place_item_on_board_unit(player, 0, 1)
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_3"]:
+        return _can_player_place_item_on_board_unit(player, 0, 2)
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_4"]:
+        return _can_player_place_item_on_board_unit(player, 0, 3)    
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_5"]:
+        return _can_player_place_item_on_board_unit(player, 0, 4)
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_6"]:
+        return _can_player_place_item_on_board_unit(player, 0, 5)
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_7"]:
+        return _can_player_place_item_on_board_unit(player, 0, 6)
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_8"]:
+        return _can_player_place_item_on_board_unit(player, 0, 7)
+    elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_9"]:
+        return _can_player_place_item_on_board_unit(player, 0, 8)
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_1"]:
+        return _can_player_place_item_on_board_unit(player, 1, 0)
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_2"]:
+        return _can_player_place_item_on_board_unit(player, 1, 1)
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_3"]:
+        return _can_player_place_item_on_board_unit(player, 1, 2)
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_4"]:
+        return _can_player_place_item_on_board_unit(player, 1, 3)
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_5"]:
+        return _can_player_place_item_on_board_unit(player, 1, 4)
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_6"]:
+        return _can_player_place_item_on_board_unit(player, 1, 5)
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_7"]:
+        return _can_player_place_item_on_board_unit(player, 1, 6)
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_8"]:
+        return _can_player_place_item_on_board_unit(player, 1, 7)
+    elif action == ACTIONS_MAP["ITEM_2_TO_BOARD_9"]:
+        return _can_player_place_item_on_board_unit(player, 1, 8)
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_1"]:
+        return _can_player_place_item_on_board_unit(player, 2, 0)
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_2"]:
+        return _can_player_place_item_on_board_unit(player, 2, 1)
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_3"]:
+        return _can_player_place_item_on_board_unit(player, 2, 2)
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_4"]:
+        return _can_player_place_item_on_board_unit(player, 2, 3)
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_5"]:
+        return _can_player_place_item_on_board_unit(player, 2, 4)
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_6"]:
+        return _can_player_place_item_on_board_unit(player, 2, 5)
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_7"]:
+        return _can_player_place_item_on_board_unit(player, 2, 6)
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_8"]:
+        return _can_player_place_item_on_board_unit(player, 2, 7)
+    elif action == ACTIONS_MAP["ITEM_3_TO_BOARD_9"]:
+        return _can_player_place_item_on_board_unit(player, 2, 8)
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_1"]:
+        return _can_player_place_item_on_board_unit(player, 3, 0)
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_2"]:
+        return _can_player_place_item_on_board_unit(player, 3, 1)
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_3"]:
+        return _can_player_place_item_on_board_unit(player, 3, 2)
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_4"]:
+        return _can_player_place_item_on_board_unit(player, 3, 3)
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_5"]:
+        return _can_player_place_item_on_board_unit(player, 3, 4)
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_6"]:
+        return _can_player_place_item_on_board_unit(player, 3, 5)
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_7"]:
+        return _can_player_place_item_on_board_unit(player, 3, 6)
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_8"]:
+        return _can_player_place_item_on_board_unit(player, 3, 7)
+    elif action == ACTIONS_MAP["ITEM_4_TO_BOARD_9"]:
+        return _can_player_place_item_on_board_unit(player, 3, 8)
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_1"]:
+        return _can_player_place_item_on_board_unit(player, 4, 0)
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_2"]:
+        return _can_player_place_item_on_board_unit(player, 4, 1)
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_3"]:
+        return _can_player_place_item_on_board_unit(player, 4, 2)
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_4"]:
+        return _can_player_place_item_on_board_unit(player, 4, 3)
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_5"]:
+        return _can_player_place_item_on_board_unit(player, 4, 4)
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_6"]:
+        return _can_player_place_item_on_board_unit(player, 4, 5)
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_7"]:
+        return _can_player_place_item_on_board_unit(player, 4, 6)
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_8"]:
+        return _can_player_place_item_on_board_unit(player, 4, 7)
+    elif action == ACTIONS_MAP["ITEM_5_TO_BOARD_9"]:
+        return _can_player_place_item_on_board_unit(player, 4, 8)
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_1"]:
+        return _can_player_place_item_on_board_unit(player, 5, 0)
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_2"]:
+        return _can_player_place_item_on_board_unit(player, 5, 1)
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_3"]:
+        return _can_player_place_item_on_board_unit(player, 5, 2)
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_4"]:
+        return _can_player_place_item_on_board_unit(player, 5, 3)
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_5"]:
+        return _can_player_place_item_on_board_unit(player, 5, 4)
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_6"]:
+        return _can_player_place_item_on_board_unit(player, 5, 5)
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_7"]:
+        return _can_player_place_item_on_board_unit(player, 5, 6)
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_8"]:
+        return _can_player_place_item_on_board_unit(player, 5, 7)
+    elif action == ACTIONS_MAP["ITEM_6_TO_BOARD_9"]:
+        return _can_player_place_item_on_board_unit(player, 5, 8)
 
     elif action == ACTIONS_MAP["REROLL"]:
         return (player.gold >= 2)
@@ -772,3 +1099,20 @@ def is_action_legal(player, action):
         return True
     else:
         raise Exception("UNRECOGNIZED ACTION", action)
+
+def _can_player_place_item_on_board_unit(player, item_index, board_index):
+    item = player.items[item_index]
+    champ = player.board[board_index]
+
+    if item == 0:
+        return False
+    if champ == None:
+        return False
+
+    for c_i in champ.items:
+        if c_i == 0: # empty slot
+            return True
+        elif c_i < 10: #component
+            if item < 10: #component
+                return True
+    return False

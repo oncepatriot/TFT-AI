@@ -59,7 +59,8 @@ def add_all_labels_data_to_training_set():
         for champion in champions:
             cid = champion['championId']
             print(cid)
-            writer.writerow([0,
+            writer.writerow([
+                0,
                 cid,0,0,0,3,
                 cid,0,0,0,3,
                 cid,0,0,0,3,
