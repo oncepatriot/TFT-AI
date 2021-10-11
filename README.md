@@ -292,7 +292,9 @@ There are many repositories and blogs that have helped me to put together this r
 cd C:\Users\Samsung\Documents\GitHub\TFT-AI
 
 docker-compose up -d
+# install dependencies for env
 bash ./scripts/install_env.sh teamfighttactics
+docker-compose exec app pip3 install -e ./environments/teamfighttactics
 
 SSH into container
 
@@ -312,7 +314,8 @@ docker-compose exec app python3 train.py -e teamfighttactics
 bash scripts/tensorboard.sh
 Navigate tolocalhost:6006 
 
-
+# Upload modle to GCS
+docker-compose exec -T app python3 upload_model_to_gcs.py
 
 # HOW TO RUN ON Google Compute engine
 https://cloud.google.com/community/tutorials/docker-compose-on-container-optimized-os
