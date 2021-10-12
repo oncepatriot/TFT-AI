@@ -8,19 +8,19 @@ import csv
 import os.path
 import time
 
-TEST_PUUID = "8o6dOaqtLQEni0LoLCCEr_VV8Q_vpKiWyjdB1hqvFbQctqTWLhI8v6F2afau2xyRiGAXx6EWKzetTg" #RamKev
+TEST_PUUID = "qW__D67NDNMof4cjm2evfC7Q3fBmrQiW0GupZHkaS5TDzA3nOzLTMq1TF6lVTZ24TGlW-j-cmLX2dw" #RamKev
 TEST_MATCH_ID = "NA1_4055205965"
 API_KEY = "RGAPI-e8eca384-e0ae-4afb-baa7-6c73ba726ac0"
 TEMP_API_KEY = "RGAPI-2f66cfaa-e70c-4b6d-afe4-12a8d1a77520"
 
 def get_match_ids_by_puuid(puuid):
-    r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/{puuid}/ids?count=50&api_key={TEMP_API_KEY}")
+    r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/{puuid}/ids?count=50&api_key={API_KEY}")
     match_ids = r.json()
     print("Response from get matches by puuid", match_ids)
     return match_ids
 
 def get_match_by_match_id(match_id):
-    r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/{match_id}?api_key={TEMP_API_KEY}")
+    r = requests.get(f"https://americas.api.riotgames.com/tft/match/v1/matches/{match_id}?api_key={API_KEY}")
     match = r.json()
     print("Response from get match by id", match)
     return r.json()
@@ -29,27 +29,32 @@ def run_match_data_scraper():
     player_puuids = [TEST_PUUID]
     match_ids_processed = {}
     while True:   
-        time.sleep(5)
+        time.sleep(10)
         print("Getting match ids by puuid:")
         puuid = player_puuids.pop(0)
 
         match_ids = get_match_ids_by_puuid(puuid)
-        print(match_ids)
         match_ids = random.sample(match_ids, 10)
 
         for match_id in match_ids:
-            if not match_ids_processed.get(match_id):
-                match_data = get_match_by_match_id(match_id)
-                match_puuids = match_data['metadata']['participants']
-                match_puuids.remove(puuid)
-                player_puuids.append(match_puuids)
+            try:
+                if not match_ids_processed.get(match_id):
+                    match_data = get_match_by_match_id(match_id)
+                    match_puuids = match_data['metadata']['participants']
+                    match_puuids.remove(puuid)
+                    player_puuids.append(match_puuids)
 
-                print("Processing Match Data: ", match_id)
-                process_match_data_and_add_to_training_data_set(match_data)
-                match_ids_processed[match_id] = True
-                time.sleep(20)
-            else:
-                continue
+                    print("Processing Match Data: ", match_id)
+                    process_match_data_and_add_to_training_data_set(match_data)
+                    match_ids_processed[match_id] = True
+                    time.sleep(15)
+                else:
+                    continue
+            except Exception as e:
+                print("error processing", match_id)
+                print("Continuing after a 30 second timeout")
+                time.sleep(30)
+
 
 def add_all_labels_data_to_training_set():
     champions = json.load(open('tft_static_data/set5patch1115/champions.json'))
