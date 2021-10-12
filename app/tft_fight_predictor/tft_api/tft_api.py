@@ -27,33 +27,37 @@ def get_match_by_match_id(match_id):
 
 def run_match_data_scraper():
     player_puuids = [TEST_PUUID]
+    puuids_processed = {}
+
     match_ids_processed = {}
-    while True:   
-        time.sleep(10)
-        print("Getting match ids by puuid:")
+
+    while True:
+        time.sleep(15)
         puuid = player_puuids.pop(0)
-
-        match_ids = get_match_ids_by_puuid(puuid)
-        match_ids = random.sample(match_ids, 10)
-
-        for match_id in match_ids:
+        if puuid not in puuids_processed:
+            puuids_processed[puuid] = True
             try:
-                if not match_ids_processed.get(match_id):
-                    match_data = get_match_by_match_id(match_id)
-                    match_puuids = match_data['metadata']['participants']
-                    match_puuids.remove(puuid)
-                    player_puuids.append(match_puuids)
+                players_matches = get_match_ids_by_puuid(puuid)
 
-                    print("Processing Match Data: ", match_id)
-                    process_match_data_and_add_to_training_data_set(match_data)
-                    match_ids_processed[match_id] = True
-                    time.sleep(15)
-                else:
-                    continue
+                for match_id in players_matches:
+                    if match_id not in match_ids_processed:
+                        match_data = get_match_by_match_id(match_id)
+                        match_puuids = match_data['metadata']['participants']
+                        match_puuids.remove(puuid)
+                        player_puuids += match_puuids
+
+                        print("Processing Match Data: ", match_id)
+                        process_match_data_and_add_to_training_data_set(match_data)
+                        match_ids_processed[match_id] = True
+                        time.sleep(15)
+                    else:
+                        continue
             except Exception as e:
-                print("error processing", match_id)
-                print("Continuing after a 30 second timeout")
-                time.sleep(30)
+                print("Couldnt get matches of ", puuid)
+                continue
+
+        else:
+            continue
 
 
 def add_all_labels_data_to_training_set():
