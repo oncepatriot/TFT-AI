@@ -4,7 +4,7 @@ gcs.upload_model_to_gcs('zoo/teamfighttactics/base.zip')
 
 
 try:
-    gcs.upload_best_model_to_gcs('zoo/teamfighttactics/tmp/best_model.zip')
+    gcs.upload_best_model_to_gcs('zoo/tmp/best_model.zip')
 except Exception:
     print("No best model to upload")
 
