@@ -134,45 +134,66 @@ def cli() -> None:
 
   parser.add_argument("--reset", "-r", action = 'store_true', default = False
                 , help="Start retraining the model from scratch")
+
   parser.add_argument("--opponent_type", "-o", type = str, default = 'mostly_best'
               , help="best / mostly_best / random / base / rules - the type of opponent to train against")
+
   parser.add_argument("--debug", "-d", action = 'store_true', default = False
               , help="Debug logging")
+
   parser.add_argument("--verbose", "-v", action = 'store_true', default = False
               , help="Show observation in debug output")
+
   parser.add_argument("--rules", "-ru", action = 'store_true', default = False
               , help="Evaluate on a ruled-based agent")
+
   parser.add_argument("--best", "-b", action = 'store_true', default = False
               , help="Uses best moves when evaluating agent against rules-based agent")
-  parser.add_argument("--env_name", "-e", type = str, default = 'tictactoe'
+
+  parser.add_argument("--env_name", "-e", type = str, default = 'teamfighttactics'
               , help="Which gym environment to train in: tictactoe, connect4, sushigo, butterfly, geschenkt, frouge")
+
   parser.add_argument("--seed", "-s",  type = int, default = 17
             , help="Random seed")
 
-  parser.add_argument("--eval_freq", "-ef",  type = int, default = 10240
+  # Originally 10240
+  parser.add_argument("--eval_freq", "-ef",  type = int, default = 1600
             , help="How many timesteps should each actor contribute before the agent is evaluated?")
+
   parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 100
             , help="How many episodes should each actor contirbute to the evaluation of the agent")
+
   parser.add_argument("--threshold", "-t",  type = float, default = 0.2
             , help="What score must the agent achieve during evaluation to 'beat' the previous version?")
+
   parser.add_argument("--gamma", "-g",  type = float, default = 0.99
             , help="The value of gamma in PPO")
+
   parser.add_argument("--timesteps_per_actorbatch", "-tpa",  type = int, default = 1024
             , help="How many timesteps should each actor contribute to the batch?")
+
   parser.add_argument("--clip_param", "-c",  type = float, default = 0.2
             , help="The clip paramater in PPO")
-  parser.add_argument("--entcoeff", "-ent",  type = float, default = 0.1
+
+  # The higher the entropy, the more random the agent, encouraging the 
+  # agent to explore exploration over beneficial outcomes. We started at .1 but 
+  # the model collapsed on a bad strategy
+  parser.add_argument("--entcoeff", "-ent",  type = float, default = 0.02
             , help="The entropy coefficient in PPO")
 
-  parser.add_argument("--optim_epochs", "-oe",  type = int, default = 4
+  # Started at 4.
+  parser.add_argument("--optim_epochs", "-oe",  type = int, default = 8
             , help="The number of epoch to train the PPO agent per batch")
+
   parser.add_argument("--optim_stepsize", "-os",  type = float, default = 0.0003
             , help="The step size for the PPO optimiser")
+
   parser.add_argument("--optim_batchsize", "-ob",  type = int, default = 1024
             , help="The minibatch size in the PPO optimiser")
             
   parser.add_argument("--lam", "-l",  type = float, default = 0.95
             , help="The value of lambda in PPO")
+
   parser.add_argument("--adam_epsilon", "-a",  type = float, default = 1e-05
             , help="The value of epsilon in the Adam optimiser")
 

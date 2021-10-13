@@ -334,3 +334,7 @@ docker-compose exec -T app mpirun -np 4 python3 train.py -e teamfighttactics
 
 # permission error? run this in all files
 sudo chmod -R 777 . 
+
+# Download logs
+gsutil -m cp -R gs://tft_models/logs/ /path_to_local
+
