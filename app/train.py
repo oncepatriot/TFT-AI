@@ -182,7 +182,7 @@ def cli() -> None:
             , help="The entropy coefficient in PPO")
 
   # Started at 4.
-  parser.add_argument("--optim_epochs", "-oe",  type = int, default = 8
+  parser.add_argument("--optim_epochs", "-oe",  type = int, default = 4
             , help="The number of epoch to train the PPO agent per batch")
 
   parser.add_argument("--optim_stepsize", "-os",  type = float, default = 0.0003
