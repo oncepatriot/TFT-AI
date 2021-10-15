@@ -178,7 +178,7 @@ def cli() -> None:
   # The higher the entropy, the more random the agent, encouraging the 
   # agent to explore exploration over beneficial outcomes. We started at .1 but 
   # the model collapsed on a bad strategy
-  parser.add_argument("--entcoeff", "-ent",  type = float, default = 0.02
+  parser.add_argument("--entcoeff", "-ent",  type = float, default = 0.01
             , help="The entropy coefficient in PPO")
 
   # Started at 4.

@@ -307,9 +307,11 @@ docker-compose exec app python3 train.py -e teamfighttactics
 docker-compose exec app mpirun -np 10 python3 train.py -e teamfighttactics
 
 bash ./scripts/install_env.sh teamfighttactics
+
+# Single Core Basic Training
 docker-compose exec app python3 train.py -e teamfighttactics
 
-
+# TENSORBOARD
 bash scripts/tensorboard.sh
 Navigate tolocalhost:6006 
 
@@ -329,12 +331,16 @@ Run rest of commands on link above
 # tft depedendencies
 docker-compose exec -T app pip3 install -e ./environments/teamfighttactics
 docker-compose exec -T app python3 train.py -e teamfighttactics
-docker-compose exec -T app mpirun -np 4 python3 train.py -e teamfighttactics
+docker-compose exec -T app mpirun --oversubscribe -np 6 python3 train.py -e teamfighttactics
 
 
 # permission error? run this in all files
 sudo chmod -R 777 . 
 
 # Download logs
-gsutil -m cp -R gs://tft_models/logs/ /path_to_local
+gsutil -m cp -R gs://tft_models/logs/ C:\Users\Samsung\Documents\GitHub\TFT-AI\app
+gsutil -m cp -R gs://tft_models/logs/ C:\Users\Samsung\Documents\GitHub\TFT-AI\app
 
+
+# SSH
+gcloud compute ssh instance-1
