@@ -157,13 +157,14 @@ def cli() -> None:
             , help="Random seed")
 
   # Originally 10240
-  parser.add_argument("--eval_freq", "-ef",  type = int, default = 1600
+  parser.add_argument("--eval_freq", "-ef",  type = int, default = 6400
             , help="How many timesteps should each actor contribute before the agent is evaluated?")
 
   parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 100
             , help="How many episodes should each actor contirbute to the evaluation of the agent")
 
-  parser.add_argument("--threshold", "-t",  type = float, default = 0.2
+  # Threshold Score is counted as rewards received
+  parser.add_argument("--threshold", "-t",  type = float, default = 4
             , help="What score must the agent achieve during evaluation to 'beat' the previous version?")
 
   parser.add_argument("--gamma", "-g",  type = float, default = 0.99
@@ -172,13 +173,13 @@ def cli() -> None:
   parser.add_argument("--timesteps_per_actorbatch", "-tpa",  type = int, default = 1024
             , help="How many timesteps should each actor contribute to the batch?")
 
+  # Clipping Range: 0.1, 0.2, 0.3
   parser.add_argument("--clip_param", "-c",  type = float, default = 0.2
             , help="The clip paramater in PPO")
 
   # The higher the entropy, the more random the agent, encouraging the 
-  # agent to explore exploration over beneficial outcomes. We started at .1 but 
-  # the model collapsed on a bad strategy
-  parser.add_argument("--entcoeff", "-ent",  type = float, default = 0.01
+  # agent to explore exploration over beneficial outcomes. Started at .1
+  parser.add_argument("--entcoeff", "-ent",  type = float, default = 0.1
             , help="The entropy coefficient in PPO")
 
   # Started at 4.
