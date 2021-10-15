@@ -157,14 +157,14 @@ def cli() -> None:
             , help="Random seed")
 
   # Originally 10240
-  parser.add_argument("--eval_freq", "-ef",  type = int, default = 6400
+  parser.add_argument("--eval_freq", "-ef",  type = int, default = 10240
             , help="How many timesteps should each actor contribute before the agent is evaluated?")
 
   parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 100
             , help="How many episodes should each actor contirbute to the evaluation of the agent")
 
   # Threshold Score is counted as rewards received
-  parser.add_argument("--threshold", "-t",  type = float, default = 4
+  parser.add_argument("--threshold", "-t",  type = float, default = 5
             , help="What score must the agent achieve during evaluation to 'beat' the previous version?")
 
   parser.add_argument("--gamma", "-g",  type = float, default = 0.99
@@ -179,7 +179,7 @@ def cli() -> None:
 
   # The higher the entropy, the more random the agent, encouraging the 
   # agent to explore exploration over beneficial outcomes. Started at .1
-  parser.add_argument("--entcoeff", "-ent",  type = float, default = 0.1
+  parser.add_argument("--entcoeff", "-ent",  type = float, default = 0.005
             , help="The entropy coefficient in PPO")
 
   # Started at 4.
