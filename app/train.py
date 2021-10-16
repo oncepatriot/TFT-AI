@@ -29,10 +29,13 @@ import config
 
 HYPER_PARAMETERS = {
   # Threshold SCORE that agent must achieve during evaluation to 'beat' the previous version
-  'threshold': 3,
+  'threshold': 2,
   # The higher the entropy, the more random the agent, encouraging the 
   # agent to explore exploration over beneficial outcomes. Started at .1
-  'entropy_coefficient': 0.05
+  'entropy_coefficient': 0.1,
+
+  # How many timesteps should elapse before agent is evaluated. Started at 10248
+  'eval_frequency': 14280,
 }
 
 def main(args):
@@ -165,7 +168,7 @@ def cli() -> None:
             , help="Random seed")
 
   # Originally 10240
-  parser.add_argument("--eval_freq", "-ef",  type = int, default = 10240
+  parser.add_argument("--eval_freq", "-ef",  type = int, default = HYPER_PARAMETERS['eval_frequency']
             , help="How many timesteps should each actor contribute before the agent is evaluated?")
 
   parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 100
