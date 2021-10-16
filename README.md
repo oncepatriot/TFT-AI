@@ -332,6 +332,7 @@ Run rest of commands on link above
 docker-compose exec -T app pip3 install -e ./environments/teamfighttactics
 docker-compose exec -T app python3 train.py -e teamfighttactics
 docker-compose exec -T app mpirun --oversubscribe -np 6 python3 train.py -e teamfighttactics
+docker-compose exec -T app mpirun -np 4 python3 train.py -e teamfighttactics
 
 
 # permission error? run this in all files

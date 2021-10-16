@@ -187,7 +187,7 @@ def cli() -> None:
 
   # The higher the entropy, the more random the agent, encouraging the 
   # agent to explore exploration over beneficial outcomes. Started at .1
-  parser.add_argument("--entcoeff", "-ent",  type = float, default =  HYPER_PARAMETERS['entropy_coefficent']
+  parser.add_argument("--entcoeff", "-ent",  type = float, default =  HYPER_PARAMETERS['entropy_coefficient']
             , help="The entropy coefficient in PPO")
 
   # Started at 4.
