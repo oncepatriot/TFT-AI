@@ -27,6 +27,14 @@ from utils.selfplay import selfplay_wrapper
 
 import config
 
+HYPER_PARAMETERS = {
+  # Threshold SCORE that agent must achieve during evaluation to 'beat' the previous version
+  'threshold': 3,
+  # The higher the entropy, the more random the agent, encouraging the 
+  # agent to explore exploration over beneficial outcomes. Started at .1
+  'entropy_coefficient': 0.05
+}
+
 def main(args):
 
   rank = MPI.COMM_WORLD.Get_rank()
@@ -164,7 +172,7 @@ def cli() -> None:
             , help="How many episodes should each actor contirbute to the evaluation of the agent")
 
   # Threshold Score is counted as rewards received
-  parser.add_argument("--threshold", "-t",  type = float, default = 5
+  parser.add_argument("--threshold", "-t",  type = float, default = HYPER_PARAMETERS['threshold']
             , help="What score must the agent achieve during evaluation to 'beat' the previous version?")
 
   parser.add_argument("--gamma", "-g",  type = float, default = 0.99
@@ -179,7 +187,7 @@ def cli() -> None:
 
   # The higher the entropy, the more random the agent, encouraging the 
   # agent to explore exploration over beneficial outcomes. Started at .1
-  parser.add_argument("--entcoeff", "-ent",  type = float, default = 0.005
+  parser.add_argument("--entcoeff", "-ent",  type = float, default =  HYPER_PARAMETERS['entropy_coefficent']
             , help="The entropy coefficient in PPO")
 
   # Started at 4.
@@ -208,3 +216,5 @@ def cli() -> None:
 
 if __name__ == '__main__':
   cli()
+
+
