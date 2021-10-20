@@ -1,0 +1,61 @@
+Logging to logs
+
+Setting up the selfplay training environment opponents...
+Loading base.zip
+
+Loading the base PPO agent to train...
+
+Setting up the selfplay evaluation environment opponents...
+Loading base.zip
+
+Setup complete - commencing learning...
+
+********** Iteration 0 ************
+Optimizing...
+     pol_surr |    pol_entpen |       vf_loss |            kl |           ent
+      0.02334 |      -0.00043 |       1.11383 |       0.12283 |       4.27096
+      0.02368 |      -0.00043 |       1.46829 |       0.14756 |       4.25215
+      0.00947 |      -0.00044 |       1.46824 |       0.08998 |       4.35437
+      0.00311 |      -0.00044 |       1.46799 |       0.04351 |       4.39414
+Evaluating losses...
+      0.00806 |      -0.00044 |       1.48818 |       0.03013 |       4.43244
+------------------------------------
+| EpLenMean       | 1.38e+03       |
+| EpRewMean       | 0.667          |
+| EpThisIter      | 9              |
+| EpisodesSoFar   | 9              |
+| TimeElapsed     | 699            |
+| TimestepsSoFar  | 16384          |
+| ev_tdlam_before | 0.000154       |
+| loss_ent        | 4.4324417      |
+| loss_kl         | 0.030130226    |
+| loss_pol_entpen | -0.00044324415 |
+| loss_pol_surr   | 0.008059718    |
+| loss_vf_loss    | 1.4881816      |
+------------------------------------
+********** Iteration 1 ************
+Eval num_timesteps=16384, episode_reward=0.13 +/- 0.05
+Total episodes ran=400
+Optimizing...
+     pol_surr |    pol_entpen |       vf_loss |            kl |           ent
+      0.00216 |      -0.00044 |       0.04537 |       0.00659 |       4.43355
+      0.00304 |      -0.00044 |       0.04433 |       0.02206 |       4.44058
+      0.00199 |      -0.00044 |       0.03993 |       0.02770 |       4.43959
+      0.00306 |      -0.00045 |       0.02363 |       0.03053 |       4.47260
+Evaluating losses...
+     -0.00115 |      -0.00045 |       0.02398 |       0.02313 |       4.45639
+------------------------------------
+| EpLenMean       | 1.33e+03       |
+| EpRewMean       | 0.333          |
+| EpThisIter      | 15             |
+| EpisodesSoFar   | 24             |
+| TimeElapsed     | 2.39e+04       |
+| TimestepsSoFar  | 32768          |
+| ev_tdlam_before | 1.27e-05       |
+| loss_ent        | 4.456394       |
+| loss_kl         | 0.023129487    |
+| loss_pol_entpen | -0.00044563942 |
+| loss_pol_surr   | -0.0011517071  |
+| loss_vf_loss    | 0.023975166    |
+------------------------------------
+********** Iteration 2 ************
