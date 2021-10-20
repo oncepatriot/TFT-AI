@@ -40,13 +40,6 @@ class SelfPlayCallback(EvalCallback):
       av_timesteps = np.mean(MPI.COMM_WORLD.allgather(self.num_timesteps))
       total_episodes = np.sum(MPI.COMM_WORLD.allgather(self.n_eval_episodes))
 
-      # Save current model to cloud
-      print("HERE")
-      if True:
-        print("SAVING")
-        upload_model_to_gcs(self.model_dir)
-
-
       if self.callback is not None:
         rules_based_rewards = MPI.COMM_WORLD.allgather(self.callback.best_mean_reward)
         av_rules_based_reward = np.mean(rules_based_rewards)
