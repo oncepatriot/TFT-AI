@@ -368,7 +368,7 @@ class GameManager():
         if champion:
             player.bench[bench_index] = None
             player.gold += champion.sell_value
-
+            player.sort_bench_and_board()
             for item in champion.champions_items:
                 if item != 0:
                     if 0 in player.items:
@@ -376,7 +376,6 @@ class GameManager():
                         player.items.sort(reverse=True)
                     else:
                         raise Exception("No place to add item to bench")
-
 
             self.champion_pool[champion.cost] += champion.champions_to_return_to_pool_when_sold # add units back to pool
         else:
@@ -387,6 +386,7 @@ class GameManager():
         if champion:
             player.board[board_index] = None
             player.gold += champion.sell_value
+            player.sort_bench_and_board()
 
             for item in champion.champions_items:
                 if item != 0:
@@ -771,6 +771,9 @@ class Player():
             print("Players inventory is full, throwing away item")
             return
 
+    def sort_bench_and_board(self):
+        sorted(self.bench, key=lambda x: 1 if x is None else 0)
+        sorted(self.bench, key=lambda x: 1 if x is None else 0)
 
     def add_champion_to_bench(self, champion):
         for i, bench_occupant in enumerate(self.bench):

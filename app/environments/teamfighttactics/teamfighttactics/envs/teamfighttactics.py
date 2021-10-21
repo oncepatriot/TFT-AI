@@ -18,7 +18,7 @@ class TeamfightTacticsEnv(gym.Env):
         self.action_space = gym.spaces.Discrete(len(ACTIONS_MAP.keys()))
 
         # Observation space - One hot encoded player state
-        self.observation_space = gym.spaces.Box(low=-1, high=1, shape=(7711,), dtype=np.float32) 
+        self.observation_space = gym.spaces.Box(low=-1, high=1, shape=(7713,), dtype=np.float32) 
 
         # self.players is defined in base class
         self.current_player_num = 0
@@ -40,7 +40,7 @@ class TeamfightTacticsEnv(gym.Env):
         of the array is in the range `[-1,1]`.
         """
         player = self.current_player
-        obs = self.player_encoder.get_player_observation(player)
+        obs = self.player_encoder.get_player_observation(self.game_manager, player)
         return obs
 
         # return np.zeros(7081)
@@ -71,7 +71,7 @@ class TeamfightTacticsEnv(gym.Env):
         # If not a ready action
         if action != 43:
             self.current_player.actions_since_last_ready += 1
-        # Force player to ready if they took 25 non ready actions
+        # Force player to ready if they took 47 non ready actions
         if self.current_player.actions_since_last_ready > 47:
             self.current_player.ready = True
             self.current_player.actions_since_last_ready = 0

@@ -1,83 +1,3 @@
-<!-- PROJECT SHIELDS -->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
-<!-- PROJECT LOGO -->
-<br />
-<p align="center">
-  <a href="https://github.com/davidADSP/SIMPLE">
-    <img src="images/logo.png" alt="Logo" height="120">
-  </a>
-
-  <!-- <h3 align="center">SIMPLE</h3> -->
-
-  <p align="center">
-    Selfplay In MultiPlayer Environments
-    <!-- <br /> -->
-    <!-- <a href="https://github.com/davidADSP/SIMPLE"><strong>Explore the docs »</strong></a> -->
-    <br />
-    <!-- <a href="https://github.com/davidADSP/SIMPLE">View Demo</a> -->
-    ·
-    <a href="https://github.com/davidADSP/SIMPLE/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/davidADSP/SIMPLE/issues">Request Feature</a>
-  </p>
-</p>
-<br>
-
-
-<!-- TABLE OF CONTENTS -->
-
-  <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#tutorial">Tutorial</a></li>
-      <ul>
-        <li><a href="#prerequisites">Quickstart</a></li>
-        <li><a href="#prerequisites">Tensorboard</a></li>
-        <li><a href="#custom-environments">Custom Environments</a></li>
-        <li><a href="#parallelisation">Parallelisation</a></li>
-      </ul>
-    </li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
-  </ol>
-
-
-
-<br>
-
----
-<!-- ABOUT THE PROJECT -->
-## About The Project
-
-<img src="images/diagram.png" alt="SIMPLE Diagram" width='100%'>
-
-This project allows you to train AI agents on custom-built multiplayer environments, through self-play reinforcement learning.
-
-It implements [Proximal Policy Optimisation (PPO)](https://openai.com/blog/openai-baselines-ppo/), with a built-in wrapper around the multiplayer environments that handles the loading and action-taking of opponents in the environment. The wrapper delays the reward back to the PPO agent, until all opponents have taken their turn. In essence, it converts the multiplayer environment into a single-player environment that is constantly evolving as new versions of the policy network are added to the network bank.
-
-To learn more, check out the accompanying [blog post](https://medium.com/applied-data-science/how-to-train-ai-agents-to-play-multiplayer-games-using-self-play-deep-reinforcement-learning-247d0b440717).
-
-This guide explains how to get started with the repo, add new custom environments and tune the hyperparameters of the system.
-
-Have fun!
 
 ---
 <!-- GETTING STARTED -->
@@ -229,65 +149,8 @@ For example to run 10 parallel threads that contribute games to the current iter
   docker-compose exec app mpirun -np 10 python3 train.py -e sushigo 
   ```
 
----
-<!-- ROADMAP -->
-## Roadmap
 
-See the [open issues](https://github.com/davidADSP/SIMPLE/issues) for a list of proposed features (and known issues).
-
-
----
-<!-- CONTRIBUTING -->
-## Contributing
-
-Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-
----
-<!-- LICENSE -->
-## License
-
-Distributed under the GPL-3.0. See `LICENSE` for more information.
-
-
----
-<!-- CONTACT -->
-## Contact
-
-David Foster - [@davidADSP](https://twitter.com/davidADSP) - david@adsp.ai
-
-Project Link: [https://github.com/davidADSP/SIMPLE](https://github.com/davidADSP/SIMPLE)
-
-
----
-<!-- ACKNOWLEDGEMENTS -->
-## Acknowledgements
-
-There are many repositories and blogs that have helped me to put together this repository. One that deserves particular acknowledgement is David's Ha's Slime Volleyball Gym, that also implements multi-agent reinforcement learning. It has helped to me understand how to adapt the callback function to a self-play setting and also to how to implement MPI so that the codebase can be highly parallelised. Definitely worth checking out! 
-
-* [David Ha - Slime Volleyball Gym](https://github.com/hardmaru/slimevolleygym)
-
----
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/davidADSP/SIMPLE.svg?style=for-the-badge
-[contributors-url]: https://github.com/davidADSP/SIMPLE/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/davidADSP/SIMPLE.svg?style=for-the-badge
-[forks-url]: https://github.com/davidADSP/SIMPLE/network/members
-[stars-shield]: https://img.shields.io/github/stars/davidADSP/SIMPLE.svg?style=for-the-badge
-[stars-url]: https://github.com/davidADSP/SIMPLE/stargazers
-[issues-shield]: https://img.shields.io/github/issues/davidADSP/SIMPLE.svg?style=for-the-badge
-[issues-url]: https://github.com/davidADSP/SIMPLE/issues
-[license-shield]: https://img.shields.io/github/license/davidADSP/SIMPLE.svg?style=for-the-badge
-[license-url]: https://github.com/davidADSP/SIMPLE/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/davidtfoster
+# SETUP
 
 cd C:\Users\Samsung\Documents\GitHub\TFT-AI
 
@@ -318,22 +181,35 @@ Navigate tolocalhost:6006
 # Upload model to GCS
 docker-compose exec -T app python3 upload_model_to_gcs.py
 
+
+
+
+
+# GOOGLE COMPUTE ENGINE STUFF BELOW
+
+
 # HOW TO RUN ON Google Compute engine
 https://cloud.google.com/community/tutorials/docker-compose-on-container-optimized-os
 
-SSH into vm:
 
+# USING GIT TO PULL / PUSH TO REPOSITORY
 git clone https://antoineblueberry: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@github.com/antoineblueberry/TFT-AI.git
 docker run docker/compose:1.24.0 version
+git pull origin master
 
 Run rest of commands on link above
 
-# tft depedendencies
+# TFT DEPENDENCY INSTALL AND RUN SCRIPTS
+docker-compose up -d
 docker-compose exec -T app pip3 install -e ./environments/teamfighttactics
 docker-compose exec -T app python3 train.py -e teamfighttactics
 docker-compose exec -T app mpirun --oversubscribe -np 6 python3 train.py -e teamfighttactics
 docker-compose exec -T app mpirun -np 4 python3 train.py -e teamfighttactics
 
+# EXPOSE TENSORBOARD
+docker-compose exec -T app tensorboard --logdir ./logs
+
+tensorboard will be available at http://35.196.75.255:6006/ (external_ip:6006/)
 
 # permission error? run this in all files
 sudo chmod -R 777 . 
@@ -345,3 +221,16 @@ gsutil -m cp -R gs://tft_models/logs/ C:\Users\Samsung\Documents\GitHub\TFT-AI\a
 
 # SSH
 gcloud compute ssh instance-1
+
+
+# TODO
+Add Carousel
+Normalize how bench, board look - make it so they left aligned
+Automated model uploading 
+
+
+# VOCAB
+batch_size - corresponds to how many experiences are used for each gradient descent update
+exerience_buffer - I think training is added to the "experience_buffer" after agent collects time_horizon amount of steps
+episodes - I think this one completed tft agme is an episode. So when reset() is called.
+timestep - taking an action. calling step()
