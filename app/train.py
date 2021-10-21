@@ -28,27 +28,6 @@ from utils.selfplay import selfplay_wrapper
 import config
 
 
-# Reading on tuning hyper parameters:
-# https://github.com/llSourcell/Unity_ML_Agents/blob/master/docs/best-practices-ppo.md
-# https://medium.com/aureliantactics/ppo-hyperparameters-and-ranges-6fc2d29bccbe
-# https://medium.com/applied-data-science/how-to-train-ai-agents-to-play-multiplayer-games-using-self-play-deep-reinforcement-learning-247d0b440717
-HYPER_PARAMETERS = {
-  # Threshold SCORE that agent must achieve during evaluation to 'beat' the previous version
-  'threshold': 2,
-  # The higher the entropy, the more random the agent, encouraging the 
-  # agent to explore exploration over beneficial outcomes. Maybe should be from: 0 to 0.01
-  'entropy_coefficient': 0.0001,
-
-  # How many timesteps should elapse before agent is evaluated. Started at 10248
-  'eval_frequency': 5124,
-
-  # Also known as Horizon range. Should range from 32 - 5000.
-  # corresponds to how many steps of experience to collect per-agent before adding it to the experience buffer. 
-  # For most stable training however, this number should be large enough to capture all the important behavior 
-  # within a sequence of an agent's actions
-  'timesteps_per_actorbatch': 4096
-}
-
 def main(args):
 
   rank = MPI.COMM_WORLD.Get_rank()
@@ -144,6 +123,8 @@ def main(args):
   del env
 
 
+
+
 def cli() -> None:
   """Handles argument extraction from CLI and passing to main().
   Note that a separate function is used rather than in __name__ == '__main__'
@@ -175,39 +156,33 @@ def cli() -> None:
   parser.add_argument("--env_name", "-e", type = str, default = 'teamfighttactics'
               , help="Which gym environment to train in: tictactoe, connect4, sushigo, butterfly, geschenkt, frouge")
 
+
+
   parser.add_argument("--seed", "-s",  type = int, default = 17
             , help="Random seed")
 
-  # Originally 10240
-  parser.add_argument("--eval_freq", "-ef",  type = int, default = HYPER_PARAMETERS['eval_frequency']
+  parser.add_argument("--eval_freq", "-ef",  type = int, default =2048
             , help="How many timesteps should each actor contribute before the agent is evaluated?")
 
   parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 100
             , help="How many episodes should each actor contirbute to the evaluation of the agent")
 
   # Threshold Score is counted as rewards received
-  parser.add_argument("--threshold", "-t",  type = float, default = HYPER_PARAMETERS['threshold']
+  parser.add_argument("--threshold", "-t",  type = float, default =1.2
             , help="What score must the agent achieve during evaluation to 'beat' the previous version?")
 
   parser.add_argument("--gamma", "-g",  type = float, default = 0.99
             , help="The value of gamma in PPO")
 
-  parser.add_argument("--timesteps_per_actorbatch", "-tpa",  type = int, default = HYPER_PARAMETERS['timesteps_per_actorbatch']
+  parser.add_argument("--timesteps_per_actorbatch", "-tpa",  type = int, default = 2048
             , help="How many timesteps should each actor contribute to the batch?")
 
-  # Clipping Range: 0.1, 0.2, 0.3
   parser.add_argument("--clip_param", "-c",  type = float, default = 0.2
             , help="The clip paramater in PPO")
 
-  # The higher the entropy, the more random the agent, encouraging the 
-  # agent to explore exploration over beneficial outcomes. Started at .1
-  parser.add_argument("--entcoeff", "-ent",  type = float, default =  HYPER_PARAMETERS['entropy_coefficient']
+  parser.add_argument("--entcoeff", "-ent",  type = float, default = 0.0001
             , help="The entropy coefficient in PPO")
 
-  # Started at 4. num_epoch is the number of passes through the experience 
-  # buffer during gradient descent. The larger the batch size, 
-  # the larger it is acceptable to make this. Decreasing 
-  # this will ensure more stable updates, at the cost of slower learning.
   parser.add_argument("--optim_epochs", "-oe",  type = int, default = 4
             , help="The number of epoch to train the PPO agent per batch")
 

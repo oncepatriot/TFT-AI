@@ -62,7 +62,14 @@ class TeamfightTacticsEnv(gym.Env):
             pass
         else:
             try:
-                self.game_manager.execute_agent_action(self.current_player, action)
+                # Not ready and action is not ready action
+                if not self.current_player.ready and action != 43:
+                    self.game_manager.execute_agent_action(self.current_player, action)
+                else:
+                    # Player is ready, ignore their actions until they
+                    # are unready again
+                    pass
+
             except Exception as e:
                 print("ERROR EXECUTING ACTION", e)
                 self.game_manager.print_board_state()
@@ -72,7 +79,7 @@ class TeamfightTacticsEnv(gym.Env):
         if action != 43:
             self.current_player.actions_since_last_ready += 1
         # Force player to ready if they took 47 non ready actions
-        if self.current_player.actions_since_last_ready > 47:
+        if self.current_player.actions_since_last_ready > 48:
             self.current_player.ready = True
             self.current_player.actions_since_last_ready = 0
 
@@ -96,7 +103,7 @@ class TeamfightTacticsEnv(gym.Env):
 
                 # Distribute rewards based on placement
                 for place, player in enumerate(self.game_manager.placements):
-                    place_to_reward = [3,2,1,1,-1,-1,-1,-2]
+                    place_to_reward = [3,2,1,1,-1,-1,-2,-3]
                     reward[player.id] = place_to_reward[place]
 
                 print("REWARDS:", reward)
