@@ -31,7 +31,6 @@ class SelfPlayCallback(EvalCallback):
 
   def _on_step(self) -> bool:
     if self.eval_freq > 0 and self.n_calls % self.eval_freq == 0:
-      print("WE I NTHER")
       result = super(SelfPlayCallback, self)._on_step() #this will set self.best_mean_reward to the reward from the evaluation as it's previously -np.inf
 
       list_of_rewards = MPI.COMM_WORLD.allgather(self.best_mean_reward)

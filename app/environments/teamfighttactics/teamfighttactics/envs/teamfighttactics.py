@@ -62,26 +62,21 @@ class TeamfightTacticsEnv(gym.Env):
             pass
         else:
             try:
-                # Not ready and action is not ready action
-                if not self.current_player.ready and action != 43:
-                    self.game_manager.execute_agent_action(self.current_player, action)
-                else:
-                    # Player is ready, ignore their actions until they
-                    # are unready again
+                if self.current_player.ready:
+                    self.current_player.actions_since_last_ready = 0
                     pass
+                else:
+                    self.current_player.actions_since_last_ready += 1
+                    self.game_manager.execute_agent_action(self.current_player, action)
+                    
+                    # Force player to ready if they took 47 non ready actions
+                    if self.current_player.actions_since_last_ready > 48:
+                        self.current_player.ready = True
 
             except Exception as e:
                 print("ERROR EXECUTING ACTION", e)
                 self.game_manager.print_board_state()
                 raise Exception("Error executing game action")
-
-        # If not a ready action
-        if action != 43:
-            self.current_player.actions_since_last_ready += 1
-        # Force player to ready if they took 47 non ready actions
-        if self.current_player.actions_since_last_ready > 48:
-            self.current_player.ready = True
-            self.current_player.actions_since_last_ready = 0
 
         # IF ALL PLAYERS ARE READY:
         # Calculate "combat math" based on all players current boards.
