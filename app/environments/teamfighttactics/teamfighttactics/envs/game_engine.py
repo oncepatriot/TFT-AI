@@ -773,7 +773,7 @@ class Player():
 
     def sort_bench_and_board(self):
         sorted(self.bench, key=lambda x: 1 if x is None else 0)
-        sorted(self.bench, key=lambda x: 1 if x is None else 0)
+        sorted(self.board, key=lambda x: 1 if x is None else 0)
 
     def add_champion_to_bench(self, champion):
         for i, bench_occupant in enumerate(self.bench):
