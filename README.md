@@ -182,9 +182,6 @@ Navigate tolocalhost:6006
 docker-compose exec -T app python3 upload_model_to_gcs.py
 
 
-
-
-
 # GOOGLE COMPUTE ENGINE STUFF BELOW
 
 
@@ -203,29 +200,32 @@ Run rest of commands on link above
 docker-compose up -d
 docker-compose exec -T app pip3 install -e ./environments/teamfighttactics
 docker-compose exec -T app python3 train.py -e teamfighttactics
+
 docker-compose exec -T app mpirun --oversubscribe -np 6 python3 train.py -e teamfighttactics
+
 docker-compose exec -T app mpirun -np 4 python3 train.py -e teamfighttactics
 
-# EXPOSE TENSORBOARD
-docker-compose exec -T app tensorboard --logdir ./logs
 
-tensorboard will be available at http://35.196.75.255:6006/ (external_ip:6006/)
+
+# EXPOSE TENSORBOARD
+docker-compose exec -T -d app tensorboard --logdir ./logs
+
+http://35.196.75.255:6006/ (external_ip:6006/)
+
 
 # permission error? run this in all files
 sudo chmod -R 777 . 
+
 
 # Download logs
 gsutil -m cp -R gs://tft_models/logs/ C:\Users\Samsung\Documents\GitHub\TFT-AI\app
 gsutil -m cp -R gs://tft_models/logs/ C:\Users\Samsung\Documents\GitHub\TFT-AI\app
 
-
 # SSH
 gcloud compute ssh instance-1
 
-
 # TODO
 Add Carousel
-Normalize how bench, board look - make it so they left aligned
 Automated model uploading 
 
 
