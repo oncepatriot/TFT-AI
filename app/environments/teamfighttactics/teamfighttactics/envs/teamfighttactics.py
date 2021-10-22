@@ -18,7 +18,7 @@ class TeamfightTacticsEnv(gym.Env):
         self.action_space = gym.spaces.Discrete(len(ACTIONS_MAP.keys()))
 
         # Observation space - One hot encoded player state
-        self.observation_space = gym.spaces.Box(low=-1, high=1, shape=(7713,), dtype=np.float32) 
+        self.observation_space = gym.spaces.Box(low=-1, high=1, shape=(7711,), dtype=np.float32) 
 
         # self.players is defined in base class
         self.current_player_num = 0
@@ -40,7 +40,7 @@ class TeamfightTacticsEnv(gym.Env):
         of the array is in the range `[-1,1]`.
         """
         player = self.current_player
-        obs = self.player_encoder.get_player_observation(self.game_manager, player)
+        obs = self.player_encoder.get_player_observation(player)
         return obs
 
         # return np.zeros(7081)
@@ -62,21 +62,19 @@ class TeamfightTacticsEnv(gym.Env):
             pass
         else:
             try:
-                if self.current_player.ready:
-                    self.current_player.actions_since_last_ready = 0
-                    pass
-                else:
-                    self.current_player.actions_since_last_ready += 1
-                    self.game_manager.execute_agent_action(self.current_player, action)
-                    
-                    # Force player to ready if they took 47 non ready actions
-                    if self.current_player.actions_since_last_ready > 49:
-                        self.current_player.ready = True
-
+                self.game_manager.execute_agent_action(self.current_player, action)
             except Exception as e:
                 print("ERROR EXECUTING ACTION", e)
                 self.game_manager.print_board_state()
                 raise Exception("Error executing game action")
+
+        # If not a ready action
+        if action != 43:
+            self.current_player.actions_since_last_ready += 1
+        # Force player to ready if they took 25 non ready actions
+        if self.current_player.actions_since_last_ready > 47:
+            self.current_player.ready = True
+            self.current_player.actions_since_last_ready = 0
 
         # IF ALL PLAYERS ARE READY:
         # Calculate "combat math" based on all players current boards.
@@ -98,7 +96,7 @@ class TeamfightTacticsEnv(gym.Env):
 
                 # Distribute rewards based on placement
                 for place, player in enumerate(self.game_manager.placements):
-                    place_to_reward = [3,2,1,1,-1,-1,-2,-3]
+                    place_to_reward = [3,2,1,1,-1,-1,-1,-2]
                     reward[player.id] = place_to_reward[place]
 
                 print("REWARDS:", reward)
