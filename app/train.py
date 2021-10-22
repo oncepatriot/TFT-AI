@@ -161,7 +161,8 @@ def cli() -> None:
   parser.add_argument("--seed", "-s",  type = int, default = 17
             , help="Random seed")
 
-  parser.add_argument("--eval_freq", "-ef",  type = int, default =2048
+  
+  parser.add_argument("--eval_freq", "-ef",  type = int, default =10240
             , help="How many timesteps should each actor contribute before the agent is evaluated?")
 
   parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 100

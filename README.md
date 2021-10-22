@@ -199,6 +199,8 @@ Run rest of commands on link above
 # TFT DEPENDENCY INSTALL AND RUN SCRIPTS
 docker-compose up -d
 docker-compose exec -T app pip3 install -e ./environments/teamfighttactics
+docker-compose exec -T app pip3 install -r requirements.txt
+
 docker-compose exec -T app python3 train.py -e teamfighttactics
 
 docker-compose exec -T app mpirun --oversubscribe -np 6 python3 train.py -e teamfighttactics
@@ -227,10 +229,13 @@ gcloud compute ssh instance-1
 # TODO
 Add Carousel
 Automated model uploading 
+Manual testing of actions - play a game loop manually see if state is updated correctly - if correct actions are legal at each step
 
 
-# VOCAB
-batch_size - corresponds to how many experiences are used for each gradient descent update
-exerience_buffer - I think training is added to the "experience_buffer" after agent collects time_horizon amount of steps
-episodes - I think this one completed tft agme is an episode. So when reset() is called.
-timestep - taking an action. calling step()
+
+# Last run
+docker-compose exec -T app mpirun -np 4 python3 train.py -r -ob 128 -ef 4600 -tpa 3200 -ent .001 -oe 4 -os .0003 -e teamfighttactics
+
+docker-compose exec app mpirun -np 4 python3 train.py -r -ob 128 -ef 4600 -tpa 3200 -ent .00001 -oe 4 -os .0003 -s 5 -e teamfighttactics
+
+
