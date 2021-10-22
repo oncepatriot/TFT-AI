@@ -70,7 +70,7 @@ class TeamfightTacticsEnv(gym.Env):
                     self.game_manager.execute_agent_action(self.current_player, action)
                     
                     # Force player to ready if they took 47 non ready actions
-                    if self.current_player.actions_since_last_ready > 48:
+                    if self.current_player.actions_since_last_ready > 49:
                         self.current_player.ready = True
 
             except Exception as e:

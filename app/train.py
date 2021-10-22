@@ -168,7 +168,7 @@ def cli() -> None:
             , help="How many episodes should each actor contirbute to the evaluation of the agent")
 
   # Threshold Score is counted as rewards received
-  parser.add_argument("--threshold", "-t",  type = float, default =1.2
+  parser.add_argument("--threshold", "-t",  type = float, default =1.5
             , help="What score must the agent achieve during evaluation to 'beat' the previous version?")
 
   parser.add_argument("--gamma", "-g",  type = float, default = 0.99
