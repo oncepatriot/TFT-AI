@@ -147,11 +147,19 @@ class PlayerEncoder():
         flattened_state = np.hstack(shop+inventory+board+bench)
         return flattened_state
 
-    def get_player_observation(self, player):
+    def get_player_observation(self, player, game_manager):
         try:
             player_flattened = self.get_player_state_flattened(player)
             player_state = self.player_state_encoder.transform([player_flattened]).toarray()[0]
-            observation = np.array([player.gold/100, player.health/100, player.streak/30, player.level/9, player.exp/100])
+            observation = np.array([
+                game_manager.stage/15,
+                game_manager.round/7,
+                player.gold/100, 
+                player.health/100, 
+                player.streak/30, 
+                player.level/9, 
+                player.exp/100
+            ])
             observation = np.concatenate((observation, player_state))
         except Exception as e:
             print(player_flattened)

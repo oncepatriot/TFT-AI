@@ -132,7 +132,7 @@ class GameManager():
         self.round = 1
         self.champion_pool = self.create_champion_pool()
         self.fight_predictor = TftFightPredictor()
-        self.placements = []
+        self.placements = [] # Placements (index0 = first place, index 7 = last place)
 
     def create_champion_pool(self):
         champion_pool = {
@@ -221,6 +221,12 @@ class GameManager():
                 alive_players += 1
 
         if alive_players <= 1:
+            # Game is over, add the last alive player to placements and return
+            # True
+            for player in self.players:
+                if not player.is_eliminated:
+                    self.placements.insert(0, player.id)
+
             return True
         else:
             return False
