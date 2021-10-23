@@ -132,7 +132,8 @@ class GameManager():
         self.round = 1
         self.champion_pool = self.create_champion_pool()
         self.fight_predictor = TftFightPredictor()
-        self.placements = [] # Placements (index0 = first place, index 7 = last place)
+        # Placements (index0 = first place, index 7 = last place). Elements are player objects
+        self.placements = [] 
 
     def create_champion_pool(self):
         champion_pool = {
@@ -225,7 +226,7 @@ class GameManager():
             # True
             for player in self.players:
                 if not player.is_eliminated:
-                    self.placements.insert(0, player.id)
+                    self.placements.insert(0, player)
 
             return True
         else:
