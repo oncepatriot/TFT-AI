@@ -226,16 +226,17 @@ gsutil -m cp -R gs://tft_models/logs/ C:\Users\Samsung\Documents\GitHub\TFT-AI\a
 # SSH
 gcloud compute ssh instance-1
 
+
+
+
+
+
 # TODO
-Add Carousel
-Automated model uploading 
-Manual testing of actions - play a game loop manually see if state is updated correctly - if correct actions are legal at each step
+- Add Carousel
+- Look into distributed training rllib: https://docs.ray.io/en/latest/rllib.html
+- Prepare for set 6 - updating encoders, predictors, and observation space size
+- Manual testing of actions - play a game loop manualy and see if state is updated correctly
+- Improve performance of game engine/environment
 
-
-
-# Last run
-docker-compose exec -T app mpirun -np 4 python3 train.py -r -ob 128 -ef 4600 -tpa 3200 -ent .001 -oe 4 -os .0003 -e teamfighttactics
-
-docker-compose exec app mpirun -np 4 python3 train.py -r -ob 128 -ef 4600 -tpa 3200 -ent .00001 -oe 4 -os .0003 -s 5 -e teamfighttactics
-
-
+actions are legal at each step
+Look into distributed training rllib: https://docs.ray.io/en/latest/rllib.html

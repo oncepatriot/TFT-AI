@@ -258,6 +258,8 @@ class GameManager():
         
         alive_players = [player for player in self.players if not player.is_eliminated]
         random.shuffle(alive_players)
+        
+        # Create ghost player if odd number of players
         if (len(alive_players) % 2) != 0:
             ghost_player = deepcopy(alive_players[-1])
             ghost_player.is_ghost = True
@@ -265,7 +267,6 @@ class GameManager():
 
         mm_pairs = [alive_players[i:i + 2] for i in range(0, len(alive_players), 2)] # create pairs
 
-        # TODO: If odd number of players, will need to create a ghost...
         for pair in mm_pairs:
             player_one = pair[0]
             player_two = pair[1]

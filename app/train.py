@@ -165,7 +165,7 @@ def cli() -> None:
   parser.add_argument("--env_name", "-e", type = str, default = 'teamfighttactics'
               , help="Which gym environment to train in: tictactoe, connect4, sushigo, butterfly, geschenkt, frouge")
 
-  parser.add_argument("--seed", "-s",  type = int, default = 17
+  parser.add_argument("--seed", "-s",  type = int, default = 14
             , help="Random seed")
 
   # Originally 10240
