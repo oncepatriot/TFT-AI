@@ -68,46 +68,47 @@ class TeamfightTacticsEnv(gym.Env):
                 self.game_manager.print_board_state()
                 raise Exception("Error executing game action")
 
-        # If not a ready action
-        if action != 43:
-            self.current_player.actions_since_last_ready += 1
-        # Force player to ready if they took 25 non ready actions
-        if self.current_player.actions_since_last_ready > 47:
-            self.current_player.ready = True
-            self.current_player.actions_since_last_ready = 0
+            # If not a ready action
+            if action != 43:
+                self.current_player.actions_since_last_ready += 1
+            # Force player to ready if they took 25 non ready actions
+            if self.current_player.actions_since_last_ready > 14:
+                self.current_player.ready = True
+                self.current_player.actions_since_last_ready = 0
 
-        # IF ALL PLAYERS ARE READY:
-        # Calculate "combat math" based on all players current boards.
-        # Matchmake players against one another, subtract healths
-        # Eliminate dead players
-        # End game if last player standing
-        if self.game_manager.is_all_players_ready:
-            self.game_manager.simulate_combat_step()
-            self.game_manager.print_board_state()
-            if self.game_manager.check_game_over():
-                print("==========")
-                print("GAME OVER")
-                print("FINAL BOARD STATE:")
-                self.game_manager.print_board_state()
-                print("==========")
-                print("FINAL PLACEMENTS:")
-                print([player.id for player in self.game_manager.placements])
-                done = True
+            # IF ALL PLAYERS ARE READY:
+            # Calculate "combat math" based on all players current boards.
+            # Matchmake players against one another, subtract healths
+            # Eliminate dead players
+            # End game if last player standing
+            if self.game_manager.is_all_players_ready:
+                self.game_manager.simulate_combat_step()
+                # self.game_manager.print_board_state()
+                if self.game_manager.check_game_over():
+                    print("==========")
+                    print("GAME OVER")
+                    print("FINAL BOARD STATE:")
+                    self.game_manager.print_board_state()
+                    print("==========")
+                    print("FINAL PLACEMENTS:")
+                    print([player.id for player in self.game_manager.placements])
+                    done = True
 
-                # Distribute rewards based on placement
-                for place, player in enumerate(self.game_manager.placements):
-                    place_to_reward = [3,2,1,1,-1,-1,-1,-2]
-                    reward[player.id] = place_to_reward[place]
+                    # Distribute rewards based on placement
+                    for place, player in enumerate(self.game_manager.placements):
+                        place_to_reward = [3,2,1,.5,-.5,-1,-2,-3]
+                        reward[player.id] = place_to_reward[place]
 
-                print("REWARDS:", reward)
+                    print("REWARDS:", reward)
 
-            else:
-                self.game_manager.distribute_income()
-                self.game_manager.roll_all_players_shops()
-                self.game_manager.increment_stage_round()
+                else:
+                    self.game_manager.distribute_income()
+                    self.game_manager.roll_all_players_shops()
+                    self.game_manager.increment_stage_round()
 
         # Update current player to the next player
         self.current_player_num = (self.current_player_num + 1) % self.n_players
+
         self.done = done
         return self.observation, reward, done, {}
 

@@ -33,20 +33,10 @@ import config
 # https://medium.com/aureliantactics/ppo-hyperparameters-and-ranges-6fc2d29bccbe
 # https://medium.com/applied-data-science/how-to-train-ai-agents-to-play-multiplayer-games-using-self-play-deep-reinforcement-learning-247d0b440717
 HYPER_PARAMETERS = {
-  # Threshold SCORE that agent must achieve during evaluation to 'beat' the previous version
   'threshold': 2,
-  # The higher the entropy, the more random the agent, encouraging the 
-  # agent to explore exploration over beneficial outcomes. Maybe should be from: 0 to 0.01
-  'entropy_coefficient': 0.0001,
-
-  # How many timesteps should elapse before agent is evaluated. Started at 10248
+  'entropy_coefficient': 0.001,
   'eval_frequency': 5124,
-
-  # Also known as Horizon range. Should range from 32 - 5000.
-  # corresponds to how many steps of experience to collect per-agent before adding it to the experience buffer. 
-  # For most stable training however, this number should be large enough to capture all the important behavior 
-  # within a sequence of an agent's actions
-  'timesteps_per_actorbatch': 4096
+  'timesteps_per_actorbatch': 2562,
 }
 
 def main(args):
@@ -182,8 +172,9 @@ def cli() -> None:
   parser.add_argument("--eval_freq", "-ef",  type = int, default = HYPER_PARAMETERS['eval_frequency']
             , help="How many timesteps should each actor contribute before the agent is evaluated?")
 
-  parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 100
-            , help="How many episodes should each actor contirbute to the evaluation of the agent")
+  # Started at 100
+  parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 4
+            , help="How many episodes should each actor contribute to the evaluation of the agent")
 
   # Threshold Score is counted as rewards received
   parser.add_argument("--threshold", "-t",  type = float, default = HYPER_PARAMETERS['threshold']
