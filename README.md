@@ -27,14 +27,6 @@ Install [Docker](https://github.com/davidADSP/SIMPLE/issues) and [Docker Compose
    ```
 
 ---
-<!-- TUTORIAL -->
-## Tutorial
-
-This is a quick tutorial to allow you to start using the two entrypoints into the codebase: `test.py` and `train.py`.
-
-*TODO - I'll be adding more substantial documentation for both of these entrypoints in due course! For now, descriptions of each command line argument can be found at the bottom of the files themselves.*
-
----
 <!-- QUICKSTART -->
 ### Quickstart
 
@@ -237,6 +229,8 @@ gcloud compute ssh instance-1
 - Prepare for set 6 - updating encoders, predictors, and observation space size
 - Manual testing of actions - play a game loop manualy and see if state is updated correctly
 - Improve performance of game engine/environment
+- Develop overwolf app to gather data for real fight prediction
+
 
 actions are legal at each step
 Look into distributed training rllib: https://docs.ray.io/en/latest/rllib.html
