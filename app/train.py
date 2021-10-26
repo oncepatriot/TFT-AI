@@ -34,7 +34,7 @@ import config
 # https://medium.com/applied-data-science/how-to-train-ai-agents-to-play-multiplayer-games-using-self-play-deep-reinforcement-learning-247d0b440717
 HYPER_PARAMETERS = {
   'threshold': 1.5,
-  'entropy_coefficient': 0.001,
+  'entropy_coefficient': 0.0001,
   'eval_frequency': 5124,
   'timesteps_per_actorbatch': 2562,
 }
@@ -165,7 +165,7 @@ def cli() -> None:
   parser.add_argument("--env_name", "-e", type = str, default = 'teamfighttactics'
               , help="Which gym environment to train in: tictactoe, connect4, sushigo, butterfly, geschenkt, frouge")
 
-  parser.add_argument("--seed", "-s",  type = int, default = 17
+  parser.add_argument("--seed", "-s",  type = int, default = 14
             , help="Random seed")
 
   # Originally 10240
@@ -173,7 +173,7 @@ def cli() -> None:
             , help="How many timesteps should each actor contribute before the agent is evaluated?")
 
   # Started at 100
-  parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 4
+  parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 15
             , help="How many episodes should each actor contribute to the evaluation of the agent")
 
   # Threshold Score is counted as rewards received
