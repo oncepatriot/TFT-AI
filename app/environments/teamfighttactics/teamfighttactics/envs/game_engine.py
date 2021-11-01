@@ -274,7 +274,7 @@ class GameManager():
         if self.is_creep_round:
             for player in self.players:
                 player.ready = True
-            return
+            return rewards
         
         alive_players = [player for player in self.players if not player.is_eliminated]
         random.shuffle(alive_players)
@@ -315,7 +315,7 @@ class GameManager():
             units_lost_by = math.floor(winner_probability * winner.num_units_on_board)
             health_loss += min(2, self.get_damage_for_x_unit_loss(units_lost_by))
             loser.health -= health_loss
-            rewards[player_two.id] = health_loss / 45
+            rewards[player_two.id] = (health_loss / 45) * -1
 
             # Approximate number of units lost by. Examples:
             # .8 * 4 units on board = 3.2 = 3 unit loss

@@ -85,7 +85,7 @@ class TeamfightTacticsEnv(gym.Env):
             # End game if last player standing
             if self.game_manager.is_all_players_ready:
                 combat_rewards = self.game_manager.simulate_combat_step()
-                reward = numpy.add(reward, combat_rewards)
+                reward = np.add(reward, combat_rewards)
                 self.game_manager.print_board_state()
                 print(reward)
                 
