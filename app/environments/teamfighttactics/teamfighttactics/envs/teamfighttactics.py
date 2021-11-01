@@ -74,7 +74,7 @@ class TeamfightTacticsEnv(gym.Env):
                 self.current_player.actions_since_last_ready += 1
 
             # Force player to ready if they took 14 non ready actions
-            if self.current_player.actions_since_last_ready > 14:
+            if self.current_player.actions_since_last_ready > 15:
                 self.current_player.ready = True
                 self.current_player.actions_since_last_ready = 0
 
