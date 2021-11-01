@@ -299,7 +299,6 @@ class GameManager():
                 winner_probability = p1_win_probability
                 winner = player_one
                 loser = player_two
-                rewards[player_one.id] += STAGE_WIN_REWARD[self.stage-1]
             else:
                 winner_probability = p2_win_probability
                 winner = player_two
@@ -307,15 +306,17 @@ class GameManager():
 
             winner.update_streak(True)
             winner.gold += 1
-            loser.update_streak(False)
+            rewards[winner.id] += STAGE_WIN_REWARD[self.stage-1]
+
 
             # Calculate health loss
+            loser.update_streak(False)
             health_loss = 0
             health_loss += self.stage_damage
-            units_lost_by = math.floor(winner_probability * winner.num_units_on_board)
-            health_loss += min(2, self.get_damage_for_x_unit_loss(units_lost_by))
+            units_lost_by = max(1, math.floor(winner_probability * winner.num_units_on_board))
+            health_loss += self.get_damage_for_x_unit_loss(units_lost_by)
             loser.health -= health_loss
-            rewards[player_two.id] = (health_loss / 45) * -1
+            rewards[loser.id] = (health_loss / 85.0) * -1
 
             # Approximate number of units lost by. Examples:
             # .8 * 4 units on board = 3.2 = 3 unit loss

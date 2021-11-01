@@ -33,10 +33,10 @@ import config
 # https://medium.com/aureliantactics/ppo-hyperparameters-and-ranges-6fc2d29bccbe
 # https://medium.com/applied-data-science/how-to-train-ai-agents-to-play-multiplayer-games-using-self-play-deep-reinforcement-learning-247d0b440717
 HYPER_PARAMETERS = {
-  'threshold': 4,
+  'threshold': 3,
   'entropy_coefficient': 0.0001,
-  'eval_frequency': 5124,
-  'timesteps_per_actorbatch': 2562,
+  'eval_frequency': 200,
+  'timesteps_per_actorbatch': 256,
 }
 
 def main(args):
@@ -173,7 +173,7 @@ def cli() -> None:
             , help="How many timesteps should each actor contribute before the agent is evaluated?")
 
   # Started at 100
-  parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 15
+  parser.add_argument("--n_eval_episodes", "-ne",  type = int, default = 3
             , help="How many episodes should each actor contribute to the evaluation of the agent")
 
   # Threshold Score is counted as rewards received
@@ -203,7 +203,7 @@ def cli() -> None:
             , help="The number of epoch to train the PPO agent per batch")
 
   parser.add_argument("--optim_stepsize", "-os",  type = float, default = 0.0003
-            , help="The step size for the PPO optimiser")
+            , help="The step size for the PPO optimiser (learning rate)")
 
   parser.add_argument("--optim_batchsize", "-ob",  type = int, default = 1024
             , help="The minibatch size in the PPO optimiser")

@@ -143,11 +143,11 @@ For example to run 10 parallel threads that contribute games to the current iter
 
 
 # SETUP
-
 cd C:\Users\Samsung\Documents\GitHub\TFT-AI
-
 docker-compose up -d
-# install dependencies for env
+
+
+# LOCAL
 bash ./scripts/install_env.sh teamfighttactics
 
 SSH into container
@@ -157,13 +157,18 @@ docker-compose exec app python3 run_data_scraper.py
 docker-compose exec app python3 run_model_trainer.py
 docker-compose exec app python3 test.py -e teamfighttactics
 docker-compose exec app python3 train.py -e teamfighttactics
+bash scripts/tensorboard.sh
+
 
 # The training process can be parallelised using MPI across multiple cores.
-docker-compose exec app mpirun -np 10 python3 train.py -e teamfighttactics
-
+docker-compose exec app mpirun -np 10 
 bash ./scripts/install_env.sh teamfighttactics
 
-# Single Core Basic Training
+
+
+# Local Single Core Basic Training
+cd C:\Users\Samsung\Documents\GitHub\TFT-AI
+docker-compose up -d
 docker-compose exec app python3 train.py -e teamfighttactics
 
 # TENSORBOARD
@@ -192,7 +197,6 @@ Run rest of commands on link above
 docker-compose up -d
 docker-compose exec -T app pip3 install -e ./environments/teamfighttactics
 docker-compose exec -T app pip3 install -r requirements.txt
-
 docker-compose exec -T app python3 train.py -e teamfighttactics
 
 docker-compose exec -T app mpirun --oversubscribe -np 6 python3 train.py -e teamfighttactics
@@ -217,8 +221,6 @@ gsutil -m cp -R gs://tft_models/logs/ C:\Users\Samsung\Documents\GitHub\TFT-AI\a
 
 # SSH
 gcloud compute ssh instance-1
-
-
 
 
 
