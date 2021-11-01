@@ -84,8 +84,11 @@ class TeamfightTacticsEnv(gym.Env):
             # Eliminate dead players
             # End game if last player standing
             if self.game_manager.is_all_players_ready:
-                self.game_manager.simulate_combat_step()
-                # self.game_manager.print_board_state()
+                combat_rewards = self.game_manager.simulate_combat_step()
+                reward = np.add(reward, combat_rewards)
+                self.game_manager.print_board_state()
+                print(reward)
+                
                 if self.game_manager.check_game_over():
                     print("==========")
                     print("GAME OVER")

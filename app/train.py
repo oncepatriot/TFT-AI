@@ -33,7 +33,7 @@ import config
 # https://medium.com/aureliantactics/ppo-hyperparameters-and-ranges-6fc2d29bccbe
 # https://medium.com/applied-data-science/how-to-train-ai-agents-to-play-multiplayer-games-using-self-play-deep-reinforcement-learning-247d0b440717
 HYPER_PARAMETERS = {
-  'threshold': 1.5,
+  'threshold': 4,
   'entropy_coefficient': 0.0001,
   'eval_frequency': 5124,
   'timesteps_per_actorbatch': 2562,

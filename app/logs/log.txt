@@ -1,4 +1,0 @@
-Logging to logs
-
-Setting up the selfplay training environment opponents...
-Loading base.zip
