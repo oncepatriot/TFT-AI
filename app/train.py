@@ -35,8 +35,8 @@ import config
 HYPER_PARAMETERS = {
   'threshold': 3,
   'entropy_coefficient': 0.0001,
-  'eval_frequency': 200,
-  'timesteps_per_actorbatch': 256,
+  'eval_frequency': 3200,
+  'timesteps_per_actorbatch': 1246,
 }
 
 def main(args):
