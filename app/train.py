@@ -34,7 +34,7 @@ import config
 # https://medium.com/applied-data-science/how-to-train-ai-agents-to-play-multiplayer-games-using-self-play-deep-reinforcement-learning-247d0b440717
 HYPER_PARAMETERS = {
   'threshold': 3,
-  'entropy_coefficient': 0.0001,
+  'entropy_coefficient': 0.00001,
   'eval_frequency': 3200,
   'timesteps_per_actorbatch': 1246,
 }
