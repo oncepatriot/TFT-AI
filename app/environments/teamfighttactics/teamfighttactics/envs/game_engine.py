@@ -441,12 +441,16 @@ class GameManager():
 
     def place_champion_from_bench_to_board(self, player, bench_index):
         # TODO: swapping requires an empty board/bench slot
+        if self.board_is_full:
+            raise Exception("Should not be able to swap champion to board if full")
         champion = player.bench[bench_index]
         player.bench[bench_index] = None
         player.add_champion_to_board(champion)
 
     def place_champion_from_board_to_bench(self, player, board_index):
         # TODO: swapping requires an empty bench/bench slot
+        if self.bench_is_full:
+            raise Exception("Should not be able to swap champion to bench if full")
         champion = player.board[board_index]
         player.board[board_index] = None
         player.add_champion_to_bench(champion)
@@ -834,9 +838,9 @@ class Player():
             if c == None:
                 champions_on_board += 1
 
-        if champions_on_board == self.level:
+        if champions_on_board >= self.level:
             return True
-    
+
     @property
     def income(self):
         income = 5
@@ -1019,6 +1023,7 @@ def is_action_legal(player, action):
         return (not player.bench_is_full and player.board[7] != None)
     elif action == ACTIONS_MAP["BOARD_9_TO_BENCH"]:
         return (not player.bench_is_full and player.board[8] != None)
+        
     elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_1"]:
         return _can_player_place_item_on_board_unit(player, 0, 0)
     elif action == ACTIONS_MAP["ITEM_1_TO_BOARD_2"]:
