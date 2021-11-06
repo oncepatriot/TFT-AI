@@ -101,7 +101,7 @@ class TeamfightTacticsEnv(gym.Env):
 
                     # Distribute rewards based on placement
                     for place, player in enumerate(self.game_manager.placements):
-                        place_to_reward = [3,2,1,.5,-.5,-1,-2,-3]
+                        place_to_reward = [5,4,2,1,-.5,-1,-2,-3]
                         reward[player.id] = place_to_reward[place]
 
                     print("REWARDS:", reward)

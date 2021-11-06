@@ -316,7 +316,7 @@ class GameManager():
             units_lost_by = max(1, math.floor(winner_probability * winner.num_units_on_board))
             health_loss += self.get_damage_for_x_unit_loss(units_lost_by)
             loser.health -= health_loss
-            rewards[loser.id] = (health_loss / 85.0) * -1
+            rewards[loser.id] = STAGE_WIN_REWARD[self.stage-1]
 
             # Approximate number of units lost by. Examples:
             # .8 * 4 units on board = 3.2 = 3 unit loss
