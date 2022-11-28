@@ -1,4 +1,6 @@
 
+This is me writing a TFT AI with zero remorse for code quality for the sake of speed and exploration. Surprisingly it somewhat works so I'm making it public for posterity
+
 ---
 <!-- GETTING STARTED -->
 
